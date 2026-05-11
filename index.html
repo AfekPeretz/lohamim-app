@@ -9,16 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="לוחמים"/>
 <title>פרויקט לוחמים</title>
 <link rel="manifest" href="manifest.json"/>
-<script>
-const CONFIG = {
-  users: {
-    Afek: { password: "afek29", phone: "972542580471", role: "admin" },
-    Lavi: { password: "Lavi1234", phone: "972509060929", role: "viewer" }
-  },
-  anthropicKey: "ANTHROPIC_KEY_HERE",
-  waRecipient: "972509060929"
-};
-</script>
+<script src="config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet"/>
 <style>
@@ -44,7 +35,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .login-field:focus{outline:none;border-color:var(--gold);}
 .login-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;border-radius:10px;color:var(--navy);font-size:16px;font-weight:900;font-family:'Heebo',sans-serif;cursor:pointer;margin-top:4px;}
 .login-btn:active{transform:scale(0.97);}
-.login-err{font-size:12px;color:var(--red);margin-top:8px;min-height:18px;}
+.login-err{display:none;margin-bottom:14px;padding:12px 16px;background:linear-gradient(135deg,rgba(231,76,60,0.15),rgba(255,105,135,0.1));border:1px solid rgba(231,76,60,0.5);border-radius:10px;font-size:13px;color:#ff6b8a;font-weight:600;text-align:center;} .login-err.show{display:block;}
 
 /* ===== APP ===== */
 .app{position:relative;z-index:1;max-width:430px;margin:0 auto;min-height:100vh;padding-bottom:100px;display:none;}
@@ -140,6 +131,41 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .lavi-check.done{background:var(--green);border-color:var(--green);color:#fff;}
 .lavi-check.notdone{color:var(--text-faint);}
 
+/* ===== PROFILE ===== */
+.profile-photo-wrap { display:flex; flex-direction:column; align-items:center; padding:20px 0 10px; }
+.profile-photo { width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid var(--gold); background:var(--navy-card); display:flex; align-items:center; justify-content:center; font-size:40px; cursor:pointer; overflow:hidden; position:relative; }
+.profile-photo img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+.profile-photo-edit { font-size:11px; color:var(--gold); margin-top:8px; cursor:pointer; }
+.profile-name-display { font-family:"Bebas Neue",sans-serif; font-size:24px; color:var(--text); margin-top:6px; letter-spacing:1px; }
+.profile-card { margin:0 10px 10px; background:var(--navy-card); border:1px solid var(--navy-border); border-radius:14px; padding:16px; }
+.profile-card-title { font-size:11px; color:var(--gold); font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px; }
+.profile-field { margin-bottom:12px; }
+.profile-label { font-size:11px; color:var(--text-dim); margin-bottom:4px; }
+.profile-value { font-size:15px; color:var(--text); font-weight:500; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05); min-height:28px; }
+.profile-input { width:100%; padding:10px 12px; background:rgba(0,0,0,0.3); border:1px solid var(--gold); border-radius:8px; color:var(--text); font-size:15px; font-family:"Heebo",sans-serif; }
+.profile-input:focus { outline:none; border-color:var(--gold-light); }
+.profile-textarea { width:100%; padding:10px 12px; background:rgba(0,0,0,0.3); border:1px solid var(--gold); border-radius:8px; color:var(--text); font-size:14px; font-family:"Heebo",sans-serif; min-height:80px; resize:vertical; }
+.profile-textarea:focus { outline:none; border-color:var(--gold-light); }
+.profile-edit-btn { width:100%; padding:12px; background:var(--gold-dim); border:1px solid var(--gold); border-radius:10px; color:var(--gold-light); font-size:14px; font-weight:700; font-family:"Heebo",sans-serif; cursor:pointer; margin:0 10px; width:calc(100% - 20px); }
+.profile-save-btn { width:calc(100% - 20px); margin:0 10px; padding:12px; background:linear-gradient(135deg,var(--gold),var(--gold-light)); border:none; border-radius:10px; color:var(--navy); font-size:14px; font-weight:900; font-family:"Heebo",sans-serif; cursor:pointer; }
+.profile-chart-wrap { margin:0 10px 10px; background:var(--navy-card); border:1px solid var(--navy-border); border-radius:14px; padding:16px; }
+.profile-chart-title { font-size:11px; color:var(--gold); font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px; }
+.chart-canvas-wrap { position:relative; width:100%; height:200px; }
+
+/* ===== GALLERY ===== */
+.gallery-folder { margin:0 10px 10px; background:var(--navy-card); border:1px solid var(--navy-border); border-radius:14px; overflow:hidden; }
+.gallery-folder-header { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; cursor:pointer; }
+.gallery-folder-title { font-size:14px; font-weight:700; color:var(--text); }
+.gallery-folder-sub { font-size:11px; color:var(--text-dim); margin-top:2px; }
+.gallery-folder-count { font-size:11px; color:var(--gold); font-weight:600; }
+.gallery-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; padding:0 2px 12px; display:none; }
+.gallery-grid.open { display:grid; }
+.gallery-item { position:relative; aspect-ratio:1; overflow:hidden; }
+.gallery-item img { width:100%; height:100%; object-fit:cover; display:block; }
+.gallery-item-label { position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.65); font-size:9px; color:#fff; padding:3px 5px; text-align:center; line-height:1.3; }
+.gallery-item-del { position:absolute; top:4px; right:4px; background:rgba(231,76,60,0.85); border:none; border-radius:50%; width:22px; height:22px; color:#fff; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.gallery-empty { text-align:center; padding:40px 20px; color:var(--text-dim); font-size:13px; }
+
 /* ===== NOTIFY ===== */
 .notify-banner{margin:10px 10px 0;background:rgba(201,168,76,0.08);border:1px solid var(--gold);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;}
 .notify-banner p{flex:1;font-size:12px;color:var(--text);line-height:1.5;}
@@ -191,7 +217,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <input class="login-field" type="text" id="loginUser" placeholder="שם משתמש" autocomplete="username"/>
     <input class="login-field" type="password" id="loginPass" placeholder="סיסמא" autocomplete="current-password"/>
     <button class="login-btn" onclick="doLogin()">כניסה</button>
-    <div class="login-err" id="loginErr"></div>
+    <div class="login-err" id="loginErr">⚠️ שם משתמש או סיסמא שגויים</div>
   </div>
 </div>
 
@@ -236,9 +262,33 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div id="historyContainer" style="padding-top:8px"></div>
   </div>
 
+  <!-- PROFILE VIEW -->
+  <div class="view" id="viewProfile">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo">פרופיל <span>הנתונים שלי</span></div>
+        <div class="user-chip" id="userChip4" onclick="doLogout()">יציאה</div>
+      </div>
+    </div>
+    <div id="profileContainer" style="padding-top:8px;padding-bottom:20px"></div>
+  </div>
+
+  <!-- GALLERY VIEW -->
+  <div class="view" id="viewGallery">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo">ספרייה <span>תמונות</span></div>
+        <div class="user-chip" id="userChip3" onclick="doLogout()">יציאה</div>
+      </div>
+    </div>
+    <div id="galleryContainer" style="padding-top:8px"></div>
+  </div>
+
   <div class="bottom-nav" id="bottomNav">
     <div class="nav-item active" id="navToday" onclick="switchView('today')"><div class="ni">🏠</div><span>היום</span></div>
     <div class="nav-item" id="navHistory" onclick="switchView('history')"><div class="ni">📊</div><span>היסטוריה</span></div>
+    <div class="nav-item" id="navGallery" onclick="switchView('gallery')"><div class="ni">🖼️</div><span>ספרייה</span></div>
+    <div class="nav-item" id="navProfile" onclick="switchView('profile')"><div class="ni">👤</div><span>פרופיל</span></div>
   </div>
 </div>
 
@@ -278,14 +328,16 @@ function doLogin() {
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value.trim();
   const err = document.getElementById('loginErr');
-  if (!CONFIG || !CONFIG.users[user]) { err.textContent = 'שם משתמש לא נמצא'; return; }
-  if (CONFIG.users[user].password !== pass) { err.textContent = 'סיסמא שגויה'; return; }
+  if (!CONFIG || !CONFIG.users[user]) { err.classList.add('show'); return; }
+  if (CONFIG.users[user].password !== pass) { err.classList.add('show'); return; }
   currentUser = user;
   localStorage.setItem('lh_session', user);
   document.getElementById('loginWrap').style.display = 'none';
   document.getElementById('appWrap').style.display = 'block';
   document.getElementById('userChip').textContent = `${user} | יציאה`;
   document.getElementById('userChip2').textContent = `${user} | יציאה`;
+  document.getElementById('userChip3').textContent = `${user} | יציאה`;
+  document.getElementById('userChip4').textContent = `${user} | יציאה`;
   initApp();
 }
 
@@ -296,7 +348,7 @@ function doLogout() {
   document.getElementById('appWrap').style.display = 'none';
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
-  document.getElementById('loginErr').textContent = '';
+  document.getElementById('loginErr').classList.remove('show');
 }
 
 function checkSession() {
@@ -307,6 +359,8 @@ function checkSession() {
     document.getElementById('appWrap').style.display = 'block';
     document.getElementById('userChip').textContent = `${saved} | יציאה`;
     document.getElementById('userChip2').textContent = `${saved} | יציאה`;
+    document.getElementById('userChip3').textContent = `${saved} | יציאה`;
+    document.getElementById('userChip4').textContent = `${saved} | יציאה`;
     initApp();
   }
 }
@@ -494,6 +548,10 @@ function handleWeighPhoto(e) {
   const r=new FileReader();
   r.onload=ev=>{
     weighPhotos[curWeighSlot]=ev.target.result;
+    // persist body photos
+    if(!state[todayKey].bodyPhotos) state[todayKey].bodyPhotos={};
+    state[todayKey].bodyPhotos[curWeighSlot]=ev.target.result;
+    save();
     const el=document.getElementById(curWeighSlot==='front'?'frontSlot':'sideSlot');
     el.classList.add('has-photo');
     el.innerHTML=`<img src="${ev.target.result}"/><span style="position:relative;z-index:1;background:rgba(0,0,0,0.5);padding:2px 6px;border-radius:4px;font-size:10px;color:#fff">${curWeighSlot==='front'?'פרונטלי ✓':'צד ✓'}</span>`;
@@ -661,6 +719,8 @@ function switchView(v) {
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
   if(v==='today'){ document.getElementById('viewToday').classList.add('active'); document.getElementById('navToday').classList.add('active'); }
+  else if(v==='gallery'){ document.getElementById('viewGallery').classList.add('active'); document.getElementById('navGallery').classList.add('active'); renderGallery(); }
+  else if(v==='profile'){ document.getElementById('viewProfile').classList.add('active'); document.getElementById('navProfile').classList.add('active'); renderProfile(); }
   else { document.getElementById('viewHistory').classList.add('active'); document.getElementById('navHistory').classList.add('active'); renderHistory(); }
 }
 
@@ -718,6 +778,372 @@ function renderHistory() {
 
 function toggleArchive(idx) {
   document.getElementById(`archive_${idx}`).classList.toggle('open');
+}
+
+
+
+// ===================== PROFILE =====================
+let profileEditMode = false;
+let profileData = JSON.parse(localStorage.getItem('lh_profile') || '{}');
+function saveProfile() { localStorage.setItem('lh_profile', JSON.stringify(profileData)); }
+
+function renderProfile() {
+  const c = document.getElementById('profileContainer');
+  const p = profileData;
+  const editing = profileEditMode;
+
+  // compute age
+  let ageStr = p.birthdate ? computeAge(p.birthdate) + ' שנים' : '—';
+
+  const photoHTML = `
+    <div class="profile-photo-wrap">
+      <div class="profile-photo" onclick="${editing ? "triggerProfilePhoto()" : ""}">
+        ${p.photo ? `<img src="${p.photo}"/>` : '👤'}
+        ${editing ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:22px">📷</div>` : ''}
+      </div>
+      ${editing ? `<div class="profile-photo-edit" onclick="triggerProfilePhoto()">שנה תמונה</div>` : ''}
+      <div class="profile-name-display">${p.firstName || ''} ${p.lastName || ''}</div>
+    </div>`;
+
+  const field = (label, key, type='text', placeholder='') => {
+    if (editing) {
+      return `<div class="profile-field">
+        <div class="profile-label">${label}</div>
+        <input class="profile-input" type="${type}" value="${p[key]||''}" placeholder="${placeholder}" oninput="profileData['${key}']=this.value${key==='birthdate'?';document.getElementById(\'prof_age\').textContent=computeAge(this.value)+\' שנים\'':''}"/>
+      </div>`;
+    }
+    let val = p[key] || '—';
+    if (key === 'currentWeight' && p[key]) val = p[key] + ' ק"ג';
+    if (key === 'targetWeight' && p[key]) val = p[key] + ' ק"ג';
+    if (key === 'bodyFat' && p[key]) val = p[key] + '%';
+    return `<div class="profile-field">
+      <div class="profile-label">${label}</div>
+      <div class="profile-value">${val}</div>
+    </div>`;
+  };
+
+  const ageField = editing
+    ? `<div class="profile-field"><div class="profile-label">גיל</div><div class="profile-value" id="prof_age">${ageStr}</div></div>`
+    : `<div class="profile-field"><div class="profile-label">גיל</div><div class="profile-value">${ageStr}</div></div>`;
+
+  const goalsField = editing
+    ? `<div class="profile-field"><div class="profile-label">מטרות ויעדים</div><textarea class="profile-textarea" oninput="profileData.goals=this.value">${p.goals||''}</textarea></div>`
+    : `<div class="profile-field"><div class="profile-label">מטרות ויעדים</div><div class="profile-value" style="white-space:pre-wrap;font-size:13px">${p.goals||'—'}</div></div>`;
+
+  const btnHTML = editing
+    ? `<button class="profile-save-btn" onclick="saveProfileData()">💾 שמור</button>`
+    : `<button class="profile-edit-btn" onclick="profileEditMode=true;renderProfile()">✏️ עריכה</button>`;
+
+  // weight history for chart
+  const weightHistory = [];
+  Object.keys(state).sort().forEach(dk => {
+    if (state[dk].weigh) weightHistory.push({ date: dk, w: parseFloat(state[dk].weigh.weight) });
+  });
+
+  c.innerHTML = `
+    <input type="file" id="profilePhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleProfilePhoto(event)"/>
+    ${photoHTML}
+    <div class="profile-card">
+      <div class="profile-card-title">פרטים אישיים</div>
+      ${field('שם פרטי','firstName','text','שם')}
+      ${field('שם משפחה','lastName','text','שם משפחה')}
+      ${field('תאריך לידה','birthdate','date','')}
+      ${ageField}
+    </div>
+    <div class="profile-card">
+      <div class="profile-card-title">נתוני גוף</div>
+      ${field('משקל נוכחי (ק"ג)','currentWeight','number','75.0')}
+      ${field('משקל יעד (ק"ג)','targetWeight','number','70.0')}
+      ${field('אחוז שומן נוכחי (%)','bodyFat','number','18')}
+    </div>
+    <div class="profile-card">
+      <div class="profile-card-title">מטרות ויעדים</div>
+      ${goalsField}
+    </div>
+    ${btnHTML}
+    <div class="profile-chart-wrap" style="margin-top:12px">
+      <div class="profile-chart-title">📈 גרף התקדמות משקל</div>
+      <div class="chart-canvas-wrap">
+        <canvas id="weightChart"></canvas>
+      </div>
+    </div>`;
+
+  // draw chart after render
+  setTimeout(() => drawWeightChart(weightHistory), 50);
+}
+
+function computeAge(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  const now = new Date();
+  let age = now.getFullYear() - d.getFullYear();
+  const m = now.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
+  return age;
+}
+
+function saveProfileData() {
+  saveProfile();
+  profileEditMode = false;
+  // also update currentWeight in today's state for graph
+  if (profileData.currentWeight) {
+    if (!state[todayKey].weigh) state[todayKey].weigh = {};
+    state[todayKey].weigh.weight = profileData.currentWeight;
+    save();
+  }
+  renderProfile();
+  showToast('פרופיל נשמר ✅', 'green');
+}
+
+function triggerProfilePhoto() {
+  document.getElementById('profilePhotoInput').click();
+}
+
+function handleProfilePhoto(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    profileData.photo = ev.target.result;
+    saveProfile();
+    renderProfile();
+    showToast('תמונת פרופיל עודכנה ✅', 'green');
+  };
+  r.readAsDataURL(f);
+}
+
+function drawWeightChart(history) {
+  const canvas = document.getElementById('weightChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const wrap = canvas.parentElement;
+  canvas.width = wrap.offsetWidth;
+  canvas.height = 200;
+  const W = canvas.width, H = canvas.height;
+  const pad = { top:20, right:20, bottom:40, left:40 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+
+  // data
+  const currentW = parseFloat(profileData.currentWeight) || null;
+  const targetW = parseFloat(profileData.targetWeight) || null;
+
+  // build points: history + current
+  let points = [...history];
+  if (currentW && !points.find(p => p.date === todayKey)) {
+    points.push({ date: todayKey, w: currentW });
+  }
+  points.sort((a,b) => a.date.localeCompare(b.date));
+
+  ctx.clearRect(0, 0, W, H);
+
+  if (points.length === 0) {
+    ctx.fillStyle = 'rgba(240,234,214,0.3)';
+    ctx.font = '13px Heebo';
+    ctx.textAlign = 'center';
+    ctx.fillText('אין נתוני משקל עדיין', W/2, H/2);
+    return;
+  }
+
+  const allW = points.map(p=>p.w);
+  if (targetW) allW.push(targetW);
+  const minW = Math.min(...allW) - 2;
+  const maxW = Math.max(...allW) + 2;
+
+  const xScale = points.length > 1 ? chartW / (points.length - 1) : chartW;
+  const yScale = chartH / (maxW - minW);
+
+  const toX = i => pad.left + i * xScale;
+  const toY = w => pad.top + (maxW - w) * yScale;
+
+  // grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (chartH / 4) * i;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + chartW, y); ctx.stroke();
+    const val = (maxW - (maxW - minW) * i / 4).toFixed(1);
+    ctx.fillStyle = 'rgba(240,234,214,0.4)';
+    ctx.font = '10px Heebo';
+    ctx.textAlign = 'right';
+    ctx.fillText(val, pad.left - 4, y + 4);
+  }
+
+  // target line
+  if (targetW) {
+    const ty = toY(targetW);
+    ctx.strokeStyle = 'rgba(46,204,113,0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6,4]);
+    ctx.beginPath(); ctx.moveTo(pad.left, ty); ctx.lineTo(pad.left + chartW, ty); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#2ecc71';
+    ctx.font = '10px Heebo';
+    ctx.textAlign = 'left';
+    ctx.fillText('יעד: ' + targetW + ' ק"ג', pad.left + 4, ty - 4);
+  }
+
+  // line
+  if (points.length > 1) {
+    ctx.strokeStyle = 'rgba(201,168,76,0.8)';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    points.forEach((p, i) => {
+      if (i === 0) ctx.moveTo(toX(i), toY(p.w));
+      else ctx.lineTo(toX(i), toY(p.w));
+    });
+    ctx.stroke();
+
+    // fill under line
+    ctx.beginPath();
+    points.forEach((p, i) => {
+      if (i === 0) ctx.moveTo(toX(i), toY(p.w));
+      else ctx.lineTo(toX(i), toY(p.w));
+    });
+    ctx.lineTo(toX(points.length-1), pad.top + chartH);
+    ctx.lineTo(toX(0), pad.top + chartH);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(201,168,76,0.08)';
+    ctx.fill();
+  }
+
+  // dots + labels
+  points.forEach((p, i) => {
+    const x = toX(i), y = toY(p.w);
+    const isCurrent = p.date === todayKey;
+    ctx.beginPath();
+    ctx.arc(x, y, isCurrent ? 7 : 4, 0, Math.PI*2);
+    ctx.fillStyle = isCurrent ? '#e74c3c' : '#c9a84c';
+    ctx.fill();
+    if (isCurrent) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    // x label (week number or date)
+    const d = new Date(p.date);
+    const lbl = `${d.getDate()}/${d.getMonth()+1}`;
+    ctx.fillStyle = 'rgba(240,234,214,0.45)';
+    ctx.font = '9px Heebo';
+    ctx.textAlign = 'center';
+    ctx.fillText(lbl, x, H - 8);
+  });
+
+  // target dot
+  if (targetW) {
+    const tx = pad.left + chartW;
+    const ty = toY(targetW);
+    ctx.beginPath();
+    ctx.arc(tx, ty, 7, 0, Math.PI*2);
+    ctx.fillStyle = '#2ecc71';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // legend
+  ctx.font = '11px Heebo';
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#e74c3c';
+  ctx.beginPath(); ctx.arc(W - pad.right - 60, pad.top + 8, 5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(240,234,214,0.6)';
+  ctx.fillText('משקל נוכחי', W - pad.right - 68, pad.top + 12);
+
+  ctx.fillStyle = '#2ecc71';
+  ctx.beginPath(); ctx.arc(W - pad.right, pad.top + 8, 5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(240,234,214,0.6)';
+  ctx.fillText('יעד', W - pad.right + 8, pad.top + 12);
+}
+
+// ===================== GALLERY =====================
+function renderGallery() {
+  const c = document.getElementById('galleryContainer');
+  // collect all photos grouped by date+folder
+  const folders = {};
+
+  Object.keys(state).sort().reverse().forEach(dateKey => {
+    const day = state[dateKey];
+    const [y,mo,d] = dateKey.split('-');
+    const dateLabel = `${d}/${mo}/${y}`;
+
+    // meal photos
+    Object.keys(day.photos || {}).forEach(mealId => {
+      const meal = MENU.find(m => m.id === mealId);
+      const mealName = meal ? meal.name : mealId;
+      const photo = day.photos[mealId];
+      if (!folders[dateKey]) folders[dateKey] = { label: dateLabel, items: [] };
+      folders[dateKey].items.push({ type: 'meal', label: mealName, photo, mealId, dateKey });
+    });
+
+    // weigh photos stored in weighPhotos — not persisted, skip
+    // body photos if stored
+    if (day.bodyPhotos) {
+      ['front','side'].forEach(slot => {
+        if (day.bodyPhotos[slot]) {
+          if (!folders[dateKey]) folders[dateKey] = { label: dateLabel, items: [] };
+          folders[dateKey].items.push({ type: 'body', label: slot === 'front' ? 'גוף — פרונטלי' : 'גוף — צד', photo: day.bodyPhotos[slot], dateKey, slot });
+        }
+      });
+    }
+  });
+
+  const keys = Object.keys(folders);
+  if (!keys.length) {
+    c.innerHTML = '<div class="gallery-empty">אין תמונות עדיין 📸<br>תמונות יופיעו כאן לאחר סימון ארוחות</div>';
+    return;
+  }
+
+  c.innerHTML = keys.map((dateKey, fi) => {
+    const folder = folders[dateKey];
+    const canDelete = isAdmin();
+    const itemsHTML = folder.items.map((item, ii) => `
+      <div class="gallery-item">
+        <img src="${item.photo}" onclick="openPhoto('${dateKey}',${ii})"/>
+        <div class="gallery-item-label">${item.label}</div>
+        ${canDelete ? `<button class="gallery-item-del" onclick="deletePhoto(event,'${dateKey}','${item.mealId||''}','${item.type}','${item.slot||''}')">✕</button>` : ''}
+      </div>`).join('');
+
+    return `<div class="gallery-folder">
+      <div class="gallery-folder-header" onclick="document.getElementById('gf_${fi}').classList.toggle('open')">
+        <div>
+          <div class="gallery-folder-title">📁 ${folder.label}</div>
+          <div class="gallery-folder-sub">${folder.items.length} תמונות</div>
+        </div>
+        <div class="gallery-folder-count">▼</div>
+      </div>
+      <div class="gallery-grid" id="gf_${fi}">${itemsHTML}</div>
+    </div>`;
+  }).join('');
+}
+
+function deletePhoto(e, dateKey, mealId, type, slot) {
+  e.stopPropagation();
+  if (!isAdmin()) return;
+  if (type === 'meal' && mealId) {
+    delete state[dateKey].photos[mealId];
+  } else if (type === 'body' && slot) {
+    if (state[dateKey].bodyPhotos) delete state[dateKey].bodyPhotos[slot];
+  }
+  save();
+  renderGallery();
+  showToast('תמונה נמחקה 🗑️', 'gold');
+}
+
+function openPhoto(dateKey, idx) {
+  // simple lightbox
+  const folder = Object.keys(state).sort().reverse();
+  // find photos for this date
+  const day = state[dateKey];
+  const items = [];
+  Object.keys(day.photos||{}).forEach(mId => items.push(day.photos[mId]));
+  if (day.bodyPhotos) { if(day.bodyPhotos.front) items.push(day.bodyPhotos.front); if(day.bodyPhotos.side) items.push(day.bodyPhotos.side); }
+  if (!items[idx]) return;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = `<img src="${items[idx]}" style="max-width:95vw;max-height:90vh;border-radius:12px;object-fit:contain;"/>`;
+  overlay.onclick = () => document.body.removeChild(overlay);
+  document.body.appendChild(overlay);
 }
 
 // ===================== TOAST =====================
