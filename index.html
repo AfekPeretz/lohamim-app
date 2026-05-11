@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="theme-color" content="#0a0f1e"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="לוחמים"/>
+<title>פרויקט לוחמים</title>
+<link rel="manifest" href="manifest.json"/>
+<script>
+const CONFIG = {
+  users: {
+    Afek: { password: "afek29", phone: "972542580471", role: "admin" },
+    Lavi: { password: "Lavi1234", phone: "972509060929", role: "viewer" }
+  },
+  anthropicKey: "ANTHROPIC_KEY_HERE",
+  waRecipient: "972509060929"
+};
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --gold:#c9a84c;--gold-light:#e8cc7a;--gold-dim:rgba(201,168,76,0.15);
+  --navy:#0a0f1e;--navy-card:#161d30;--navy-border:rgba(201,168,76,0.2);
+  --text:#f0ead6;--text-dim:rgba(240,234,214,0.55);--text-faint:rgba(240,234,214,0.3);
+  --green:#2ecc71;--green-dim:rgba(46,204,113,0.12);
+  --blue:#3498db;--blue-dim:rgba(52,152,219,0.12);
+  --purple:#9b59b6;--purple-dim:rgba(155,89,182,0.12);
+  --red:#e74c3c;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--navy);color:var(--text);font-family:'Heebo',sans-serif;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 0%,rgba(201,168,76,0.07) 0%,transparent 55%),radial-gradient(ellipse at 80% 100%,rgba(201,168,76,0.04) 0%,transparent 50%);pointer-events:none;z-index:0;}
+
+/* ===== LOGIN ===== */
+.login-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.login-box{background:var(--navy-card);border:1px solid var(--gold);border-radius:20px;padding:36px 28px;width:100%;max-width:360px;text-align:center;}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--gold);letter-spacing:3px;margin-bottom:4px;}
+.login-sub{font-size:12px;color:var(--text-dim);margin-bottom:28px;}
+.login-field{width:100%;padding:13px 16px;background:rgba(0,0,0,0.3);border:1px solid var(--navy-border);border-radius:10px;color:var(--text);font-size:15px;font-family:'Heebo',sans-serif;margin-bottom:12px;text-align:right;}
+.login-field:focus{outline:none;border-color:var(--gold);}
+.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;border-radius:10px;color:var(--navy);font-size:16px;font-weight:900;font-family:'Heebo',sans-serif;cursor:pointer;margin-top:4px;}
+.login-btn:active{transform:scale(0.97);}
+.login-err{font-size:12px;color:var(--red);margin-top:8px;min-height:18px;}
+
+/* ===== APP ===== */
+.app{position:relative;z-index:1;max-width:430px;margin:0 auto;min-height:100vh;padding-bottom:100px;display:none;}
+.header{padding:16px 16px 12px;border-bottom:1px solid var(--navy-border);background:rgba(10,15,30,0.97);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);}
+.header-top{display:flex;justify-content:space-between;align-items:center;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);letter-spacing:2px;}
+.logo span{color:var(--text-dim);font-size:11px;font-family:'Heebo',sans-serif;font-weight:300;letter-spacing:0;display:block;margin-top:-3px;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.date-chip{background:var(--gold-dim);border:1px solid var(--navy-border);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--gold-light);font-weight:500;}
+.user-chip{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--green);font-weight:700;cursor:pointer;}
+.progress-bar-wrap{margin-top:10px;}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:4px;}
+.progress-track{height:3px;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:4px;transition:width 0.6s cubic-bezier(.4,0,.2,1);}
+.section-label{font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;padding:16px 14px 6px;font-weight:700;}
+
+/* ===== CARDS ===== */
+.card{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;overflow:hidden;margin:0 10px 8px;transition:border-color 0.3s;}
+.card.done{border-color:rgba(46,204,113,0.25);}
+.card.lohamim-card{border-color:rgba(201,168,76,0.4);}
+.card.lohamim-card.done{border-color:rgba(46,204,113,0.35);}
+.card-header{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;}
+.card-icon{width:40px;height:40px;border-radius:10px;background:var(--gold-dim);border:1px solid var(--navy-border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;transition:all 0.3s;}
+.card.done .card-icon{background:var(--green-dim);border-color:rgba(46,204,113,0.25);}
+.card-info{flex:1;min-width:0;}
+.card-name{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;}
+.card-meta{display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap;}
+.card-time{font-size:11px;color:var(--gold);font-weight:500;}
+.card-kcal{font-size:11px;color:var(--text-faint);}
+.badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:0.5px;}
+.badge-l{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,168,76,0.3);}
+.badge-d{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(52,152,219,0.2);}
+.badge-v{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(155,89,182,0.2);}
+.card-check{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--navy-border);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:all 0.3s;color:var(--text-faint);}
+.card.done .card-check{background:var(--green);border-color:var(--green);color:#fff;}
+.card-body{padding:0 14px 14px;display:none;}
+.card-body.open{display:block;}
+.ir{display:flex;justify-content:space-between;align-items:flex-start;font-size:12px;color:var(--text-dim);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);gap:8px;}
+.ir:last-child{border:none;}
+.ir .v{color:var(--text);font-weight:500;text-align:left;flex-shrink:0;}
+.vit-sec{margin-top:10px;padding-top:10px;border-top:1px solid rgba(155,89,182,0.2);}
+.vit-lbl{font-size:10px;color:var(--purple);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.vit-item{font-size:11px;color:var(--text-dim);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);display:flex;align-items:flex-start;gap:5px;}
+.vit-item:last-child{border:none;}
+.vit-item::before{content:'💊';font-size:10px;flex-shrink:0;}
+.vit-note{font-size:10px;color:var(--text-faint);font-style:italic;margin-top:5px;}
+.photo-sec{margin-top:10px;}
+.photo-lbl{font-size:10px;color:var(--gold);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.photo-lbl::before{content:'📸 ';}
+.upload-btn{width:100%;padding:11px;background:var(--gold-dim);border:1.5px dashed var(--gold);border-radius:10px;color:var(--gold-light);font-size:12px;font-family:'Heebo',sans-serif;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.photo-prev{width:100%;height:150px;border-radius:10px;object-fit:cover;border:1px solid var(--navy-border);display:none;}
+.photo-prev.show{display:block;}
+.abtn{width:100%;margin-top:10px;padding:13px;border:none;border-radius:10px;font-size:14px;font-weight:900;font-family:'Heebo',sans-serif;cursor:pointer;transition:all 0.2s;}
+.abtn:active{transform:scale(0.97);}
+.abtn.primary{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);}
+.abtn.primary:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+.abtn.wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-size:13px;margin-top:6px;}
+.abtn.simple{background:var(--green-dim);color:var(--green);border:1px solid rgba(46,204,113,0.3);}
+.abtn.danger{background:rgba(231,76,60,0.15);color:var(--red);border:1px solid rgba(231,76,60,0.3);font-size:13px;}
+.done-banner{text-align:center;color:var(--green);font-weight:700;font-size:13px;padding:8px 0;}
+
+/* ===== WEIGH ===== */
+.weigh-card{margin:0 10px 8px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03));border:1px solid var(--gold);border-radius:14px;padding:16px;}
+.weigh-title{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);letter-spacing:1px;margin-bottom:2px;}
+.weigh-sub{font-size:11px;color:var(--text-dim);margin-bottom:12px;}
+.weigh-row{display:flex;gap:8px;margin-bottom:10px;}
+.weigh-input{flex:1;padding:11px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--navy-border);border-radius:8px;color:var(--text);font-size:16px;font-family:'Heebo',sans-serif;text-align:center;}
+.weigh-input:focus{outline:none;border-color:var(--gold);}
+.weigh-unit{display:flex;align-items:center;padding:0 10px;color:var(--gold);font-weight:700;font-size:14px;}
+.photo-row{display:flex;gap:8px;margin-bottom:10px;}
+.photo-slot{flex:1;height:80px;border-radius:10px;background:rgba(0,0,0,0.3);border:1.5px dashed var(--navy-border);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--text-dim);gap:3px;cursor:pointer;transition:border-color 0.2s;overflow:hidden;position:relative;}
+.photo-slot.has-photo{border-style:solid;border-color:var(--gold);}
+.photo-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.photo-slot span{position:relative;z-index:1;}
+
+/* ===== UPLOAD MENU ===== */
+.upload-menu-card{margin:0 10px 8px;background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;padding:16px;}
+.upload-menu-title{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;margin-bottom:4px;}
+.upload-menu-sub{font-size:11px;color:var(--text-dim);margin-bottom:12px;}
+.file-drop{width:100%;padding:20px;background:rgba(0,0,0,0.2);border:1.5px dashed var(--navy-border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:border-color 0.2s;text-align:center;}
+.file-drop:hover{border-color:var(--gold);}
+.file-drop .drop-icon{font-size:28px;}
+.file-drop .drop-text{font-size:13px;color:var(--text-dim);}
+.file-drop .drop-sub{font-size:11px;color:var(--text-faint);}
+.ai-status{margin-top:10px;padding:10px 14px;background:rgba(155,89,182,0.1);border:1px solid rgba(155,89,182,0.3);border-radius:8px;font-size:12px;color:var(--purple);display:none;}
+.ai-status.show{display:block;}
+
+/* ===== LAVI VIEW ===== */
+.lavi-meal-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;margin:0 10px 8px;}
+.lavi-meal-name{font-size:15px;font-weight:700;color:var(--text);}
+.lavi-meal-time{font-size:11px;color:var(--gold);margin-top:2px;}
+.lavi-check{width:36px;height:36px;border-radius:50%;border:2px solid var(--navy-border);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.lavi-check.done{background:var(--green);border-color:var(--green);color:#fff;}
+.lavi-check.notdone{color:var(--text-faint);}
+
+/* ===== NOTIFY ===== */
+.notify-banner{margin:10px 10px 0;background:rgba(201,168,76,0.08);border:1px solid var(--gold);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.notify-banner p{flex:1;font-size:12px;color:var(--text);line-height:1.5;}
+.notify-btn{padding:8px 14px;background:var(--gold);border:none;border-radius:8px;color:var(--navy);font-weight:700;font-family:'Heebo',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;}
+
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--navy-card);border:1px solid var(--navy-border);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--text);z-index:9999;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.gold{border-color:var(--gold);color:var(--gold);}
+.toast.green{border-color:var(--green);color:var(--green);}
+.toast.purple{border-color:var(--purple);color:var(--purple);}
+
+/* ===== NAV ===== */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,15,30,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--navy-border);display:flex;max-width:430px;margin:0 auto;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 0 13px;gap:3px;cursor:pointer;font-size:10px;color:var(--text-dim);font-weight:500;transition:color 0.2s;}
+.nav-item.active{color:var(--gold);}
+.ni{font-size:19px;}
+.view{display:none;}
+.view.active{display:block;}
+
+/* ===== HISTORY ===== */
+.history-entry{margin:0 10px 10px;background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;overflow:hidden;}
+.history-header{padding:14px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.history-date{font-size:13px;color:var(--gold);font-weight:700;}
+.history-meta{font-size:11px;color:var(--text-dim);margin-top:2px;}
+.history-body{padding:0 16px 14px;display:none;}
+.history-body.open{display:block;}
+.history-meal-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.history-meal-row:last-child{border:none;}
+.history-photos{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.history-photos img{width:55px;height:55px;border-radius:7px;object-fit:cover;}
+.history-empty{text-align:center;padding:50px 20px;color:var(--text-dim);font-size:14px;}
+.menu-archive-entry{margin:0 10px 8px;background:rgba(155,89,182,0.08);border:1px solid rgba(155,89,182,0.3);border-radius:12px;padding:12px 14px;cursor:pointer;}
+.menu-archive-title{font-size:13px;font-weight:700;color:var(--purple);margin-bottom:4px;}
+.menu-archive-sub{font-size:11px;color:var(--text-dim);}
+.menu-archive-meals{margin-top:8px;padding-top:8px;border-top:1px solid rgba(155,89,182,0.2);display:none;}
+.menu-archive-meals.open{display:block;}
+.archive-meal-row{font-size:12px;color:var(--text-dim);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.archive-meal-row:last-child{border:none;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">⚔️ לוחמים</div>
+    <div class="login-sub">פרויקט לוחמים — Alpha Protocol</div>
+    <input class="login-field" type="text" id="loginUser" placeholder="שם משתמש" autocomplete="username"/>
+    <input class="login-field" type="password" id="loginPass" placeholder="סיסמא" autocomplete="current-password"/>
+    <button class="login-btn" onclick="doLogin()">כניסה</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="appWrap">
+
+  <div class="notify-banner" id="notifyBanner" style="display:none">
+    <span style="font-size:22px">🔔</span>
+    <p>אפשר התראות לקבל תזכורות לכל הארוחות</p>
+    <button class="notify-btn" onclick="requestNotifications()">אישור</button>
+  </div>
+
+  <!-- TODAY VIEW -->
+  <div class="view active" id="viewToday">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo">פרויקט לוחמים <span>Alpha Protocol</span></div>
+        <div class="header-right">
+          <div class="date-chip" id="dateChip"></div>
+          <div class="user-chip" id="userChip" onclick="doLogout()">יציאה</div>
+        </div>
+      </div>
+      <div class="progress-bar-wrap" id="progressWrap">
+        <div class="progress-label"><span>התקדמות יומית</span><span id="progressText">0 / 0</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div id="mainContainer"></div>
+    <input type="file" id="mealPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleMealPhoto(event)"/>
+    <input type="file" id="weighPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleWeighPhoto(event)"/>
+    <input type="file" id="menuFileInput" accept="image/*,.pdf" style="display:none" onchange="handleMenuUpload(event)"/>
+  </div>
+
+  <!-- HISTORY VIEW -->
+  <div class="view" id="viewHistory">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo">היסטוריה <span>מעקב יומי</span></div>
+        <div class="user-chip" id="userChip2" onclick="doLogout()">יציאה</div>
+      </div>
+    </div>
+    <div id="historyContainer" style="padding-top:8px"></div>
+  </div>
+
+  <div class="bottom-nav" id="bottomNav">
+    <div class="nav-item active" id="navToday" onclick="switchView('today')"><div class="ni">🏠</div><span>היום</span></div>
+    <div class="nav-item" id="navHistory" onclick="switchView('history')"><div class="ni">📊</div><span>היסטוריה</span></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===================== DEFAULT MENU =====================
+const DEFAULT_MENU = [
+  {id:'alpha_elixir',time:'04:00',icon:'💧',name:'Alpha Elixir',kcal:'~55 kcal',type:'drink',isLohamim:false,requiresPhoto:false,notify:'Alpha Elixir — הידרציה! 💧',items:[{l:'מים + מי קוקוס 200ml (50/50)',v:'בסיס'},{l:'קמצוץ מלח הימלאי + ACV 1 כף',v:'בקשית'},{l:'קריאטין 5g (מנה 1)',v:'1 scoop'},{l:'Thorne אלקטרוליטים',v:'1 stick'}],vitamins:['B12 סאבלינגואל (1 טבלית)','NMN 175mg (1 קפסולה)','TMG 1000mg (1 טבלית)','L-Arginine 1000mg (1 טבלית)',"Lion's Mane (1 קפסולה) — מנה 1"],vitNote:'* על קיבה ריקה'},
+  {id:'pre_run',time:'05:30',icon:'☕',name:'Pre-Run Coffee',kcal:'~120 kcal',type:'drink',isLohamim:false,requiresPhoto:false,notify:'Pre-Run Coffee — קפה + MCT! ☕',items:[{l:'קפה שחור',v:'~2 kcal'},{l:'שמן MCT',v:'1 כף (14g)'}],vitamins:['L-Tyrosine 500mg (1 קפסולה — NOW Foods)']},
+  {id:'pre_gym',time:'06:00',icon:'⚡',name:'Pre-Gym Fuel + פרי',kcal:'~105 kcal',type:'food',isLohamim:false,requiresPhoto:false,notify:'Pre-Gym — Pump Stack + פרי! ⚡🍎',items:[{l:'C4 Sport',v:'1 scoop'},{l:'L-Citrulline',v:'4 קפסולות (3000mg)'},{l:'Beta-Alanine',v:'3g (1 scoop)'},{l:'תפוח / בננה / תפוז / קלמנטינה',v:'1 יחידה'}],vitamins:['Shilajit (1 קפסולה)','Cordyceps (1 קפסולה / 1 scoop אבקה)']},
+  {id:'intra',time:'08:00',icon:'🏋️',name:'Intra-Workout',kcal:'~110 kcal',type:'drink',isLohamim:false,requiresPhoto:false,notify:'Intra-Workout — EAA + Cluster Dextrin! 💪',items:[{l:'EAA',v:'1 scoop'},{l:'Cluster Dextrin — NutraBio Pineapple',v:'1 scoop (25g)'}]},
+  {id:'meal1',time:'09:30',icon:'🥛',name:'ארוחה 1 — שייק + שקדים',kcal:'~445 kcal',type:'food',isLohamim:true,requiresPhoto:true,notify:'ארוחה 1 — שייק חלבון + פרי + שקדים! 🥛💪',items:[{l:'מעדן חלבון / סקופ חלבון',v:'30g חלבון'},{l:'פרי 1',v:'תפוח / תמרים / קלמנטינה / בננה'},{l:'שקדים',v:'30g'}],vitamins:['קריאטין 5g — מנה 2 (1 scoop)','Sunflower Lecithin (1 scoop — Microingredients)','Maca Root (2 קפסולות — Bronson Extract)','Moringa (1 כפית אבקה)']},
+  {id:'fat_window',time:'11:00',icon:'🧬',name:'Fat & Vitamin Window',kcal:'—',type:'vitamins',isLohamim:false,requiresPhoto:false,notify:'11:00 — ויטמינים עם שומן! 🧬',items:[],vitamins:['Vit D3 + K2 (4 טיפות — נוזלי)','Omega-3 (1 קפסולה) — מנה 1','Vit E-400 (1 softgel — NOW Foods)','Tongkat Ali 400mg (1 קפסולה)','Ashwagandha (1 קפסולה)',"Lion's Mane (1 קפסולה) — מנה 2"],vitNote:'* עם שומן — שקדים מארוחה 1 מספיקים'},
+  {id:'meal2',time:'13:45',icon:'🍗',name:'ארוחה 2 — צהריים',kcal:'~720 kcal',type:'food',isLohamim:true,requiresPhoto:true,notify:'ארוחה 2 — Zinc Window! עוף + פחמימה 🍗🍚',items:[{l:'חזה עוף / שייטל / דג אמנון',v:'200g'},{l:'פסטה יבש / אורז מבושל',v:'150g / 200g'},{l:'ברוקולי + שעועית ירוקה + ירקות',v:'100g+100g'},{l:'שמן/בישול',v:'~50 kcal'},{l:'🍊 מיץ אשכולית סחוט',v:'250ml'}],vitamins:['Zinc 50mg SOLGAR (1 טבלית) ⚠️ יום כן','MyVitamins Zinc+Vit C (1 טבלית) ⚠️ יום לא','Beet Root (2 קפסולות)','Panax Ginseng (1 קפסולה)','Rhodiola (1 קפסולה)','Horse Chestnut 300mg (1 קפסולה — NOW Foods)']},
+  {id:'pomegranate',time:'16:30',icon:'🍹',name:'מיץ רימונים',kcal:'~150 kcal',type:'drink',isLohamim:false,requiresPhoto:false,notify:'16:30 — מיץ רימונים סחוט! 🍹',items:[{l:'מיץ רימונים סחוט',v:'250ml'}]},
+  {id:'meal3',time:'20:30',icon:'🥗',name:'ארוחה 3 — טונה + סלט',kcal:'~260 kcal',type:'food',isLohamim:true,requiresPhoto:true,notify:'ארוחה 3 — טונה + סלט! 🐟🥗',items:[{l:'טונה במים',v:'160g (1 פחית)'},{l:'סלט ירקות',v:'3–4 סוגים'},{l:'קטשופ + מיונז',v:'כף כל אחד'}],vitamins:['Omega-3 (1 קפסולה) — מנה 2','P-5-P Vitamin B6 50mg (1 קפסולה — NOW Foods)']},
+  {id:'meal4',time:'21:00',icon:'🍳',name:'ארוחה 4 — ביצים + קוטג׳',kcal:'~430 kcal',type:'food',isLohamim:true,requiresPhoto:true,notify:"ארוחה 4 — ביצים + קוטג' + פריכיות! 🍳",items:[{l:'3 ביצים שלמות',v:'~210 kcal'},{l:"קוטג' 5%",v:'150g'},{l:'פריכיות',v:"5 יח'"},{l:'2 ירקות לבחירה',v:'200g'}]},
+  {id:'night',time:'21:30',icon:'🌙',name:'Night Recovery Stack',kcal:'~200 kcal',type:'drink',isLohamim:false,requiresPhoto:false,notify:'Night Recovery — Casein + שוקו פטריות! 🌙',items:[{l:'ON Casein',v:'1 scoop (30g חלבון)'},{l:'Mushroom Hot Chocolate / Four Sigmatic',v:'16g (בחר אחד)'},{l:'Nesquik No Sugar Added',v:'1 כף'}],vitamins:['Magnesium Bisglycinate 200mg (1 scoop — Natural Factors)','JoyMode (1 Packet) — אופציונלי']}
+];
+
+// ===================== STATE =====================
+let currentUser = null;
+let MENU = JSON.parse(localStorage.getItem('lh_menu') || 'null') || DEFAULT_MENU;
+let state = JSON.parse(localStorage.getItem('lh_v4') || '{}');
+let menuHistory = JSON.parse(localStorage.getItem('lh_menu_history') || '[]');
+let todayKey = new Date().toISOString().split('T')[0];
+if (!state[todayKey]) state[todayKey] = {items:{},photos:{},weigh:null};
+let curPhotoId = null, curWeighSlot = null, weighPhotos = {front:null,side:null};
+
+function save() { localStorage.setItem('lh_v4', JSON.stringify(state)); }
+function saveMenu() { localStorage.setItem('lh_menu', JSON.stringify(MENU)); }
+function saveMenuHistory() { localStorage.setItem('lh_menu_history', JSON.stringify(menuHistory)); }
+
+// ===================== LOGIN =====================
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  const err = document.getElementById('loginErr');
+  if (!CONFIG || !CONFIG.users[user]) { err.textContent = 'שם משתמש לא נמצא'; return; }
+  if (CONFIG.users[user].password !== pass) { err.textContent = 'סיסמא שגויה'; return; }
+  currentUser = user;
+  localStorage.setItem('lh_session', user);
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('appWrap').style.display = 'block';
+  document.getElementById('userChip').textContent = `${user} | יציאה`;
+  document.getElementById('userChip2').textContent = `${user} | יציאה`;
+  initApp();
+}
+
+function doLogout() {
+  localStorage.removeItem('lh_session');
+  currentUser = null;
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('appWrap').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginErr').textContent = '';
+}
+
+function checkSession() {
+  const saved = localStorage.getItem('lh_session');
+  if (saved && CONFIG && CONFIG.users[saved]) {
+    currentUser = saved;
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('appWrap').style.display = 'block';
+    document.getElementById('userChip').textContent = `${saved} | יציאה`;
+    document.getElementById('userChip2').textContent = `${saved} | יציאה`;
+    initApp();
+  }
+}
+
+function isAdmin() { return currentUser && CONFIG.users[currentUser]?.role === 'admin'; }
+
+// ===================== INIT =====================
+function initApp() {
+  updateDate();
+  renderAll();
+  updateProgress();
+  registerSW();
+  checkNotify();
+  scheduleAll();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Enter on password field
+  document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  checkSession();
+});
+
+function updateDate() {
+  const days=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+  const months=['ינו','פבר','מרץ','אפר','מאי','יונ','יול','אוג','ספט','אוק','נוב','דצ'];
+  const d=new Date();
+  document.getElementById('dateChip').textContent=`יום ${days[d.getDay()]} • ${d.getDate()} ${months[d.getMonth()]}`;
+}
+
+// ===================== RENDER =====================
+function renderAll() {
+  const c = document.getElementById('mainContainer');
+  c.innerHTML = '';
+
+  if (!isAdmin()) {
+    // LAVI VIEW
+    document.getElementById('progressWrap').style.display = 'none';
+    c.innerHTML = `<div class="section-label">🍽️ ארוחות היום</div>`;
+    const lohamimMeals = MENU.filter(m => m.isLohamim);
+    lohamimMeals.forEach(meal => {
+      const done = !!state[todayKey].items[meal.id];
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <div class="lavi-meal-row">
+          <div>
+            <div class="lavi-meal-name">${meal.name}</div>
+            <div class="lavi-meal-time">⏰ ${meal.time}</div>
+          </div>
+          <div class="lavi-check ${done?'done':'notdone'}">${done?'✓':'○'}</div>
+        </div>`;
+      c.appendChild(div);
+    });
+    // Upload menu for Lavi too
+    renderUploadSection(c);
+    return;
+  }
+
+  // AFEK ADMIN VIEW
+  document.getElementById('progressWrap').style.display = 'block';
+
+  // Weigh card
+  c.innerHTML += `
+    <div class="section-label">⚖️ שקילה יומית</div>
+    <div class="weigh-card">
+      <div class="weigh-title">שקילה + תמונות גוף</div>
+      <div class="weigh-sub">כל יום 06:00 — בלי חולצה</div>
+      <div class="weigh-row">
+        <input class="weigh-input" type="number" id="weightInput" placeholder="75.5" step="0.1" min="40" max="200"/>
+        <div class="weigh-unit">ק"ג</div>
+      </div>
+      <div class="photo-row">
+        <div class="photo-slot" id="frontSlot" onclick="triggerWP('front')"><span style="font-size:20px">📸</span><span>פרונטלי</span></div>
+        <div class="photo-slot" id="sideSlot" onclick="triggerWP('side')"><span style="font-size:20px">📸</span><span>צד</span></div>
+      </div>
+      <button class="abtn primary" onclick="sendWeighWA()">שלח ללביא ⚡</button>
+    </div>
+    <div class="section-label">🍽️ תפריט יומי מלא</div>`;
+
+  MENU.forEach(meal => {
+    const done = !!state[todayKey].items[meal.id];
+    const photo = state[todayKey].photos[meal.id];
+    const badge = meal.isLohamim ? `<span class="badge badge-l">לוחמים</span>` :
+      meal.type==='drink' ? `<span class="badge badge-d">שתייה</span>` :
+      meal.type==='vitamins' ? `<span class="badge badge-v">ויטמינים</span>` : '';
+    const itemsH = (meal.items||[]).map(i=>`<div class="ir"><span>${i.l}</span><span class="v">${i.v}</span></div>`).join('');
+    const vitsH = (meal.vitamins&&meal.vitamins.length) ? `
+      <div class="vit-sec">
+        <div class="vit-lbl">💊 תוספים וויטמינים</div>
+        ${meal.vitamins.map(v=>`<div class="vit-item">${v}</div>`).join('')}
+        ${meal.vitNote?`<div class="vit-note">${meal.vitNote}</div>`:''}
+      </div>` : '';
+    const photoH = meal.requiresPhoto ? `
+      <div class="photo-sec">
+        <div class="photo-lbl">חובה תמונת ארוחה</div>
+        ${photo
+          ? `<img src="${photo}" class="photo-prev show"/>`
+          : `<button class="upload-btn" onclick="triggerMP('${meal.id}')">📷 צלם / העלה תמונה</button>
+             <img src="" class="photo-prev" id="prev_${meal.id}"/>`}
+      </div>` : '';
+    const canDone = !meal.requiresPhoto || !!photo;
+    const bodyH = done
+      ? `<div class="done-banner">✅ בוצע!</div>
+         ${photo ? `<img src="${photo}" class="photo-prev show" style="margin-top:8px"/>
+         <button class="abtn wa" onclick="sendMealWA('${meal.id}')">📲 שלח ללביא בוואטסאפ</button>` : ''}`
+      : `${itemsH}${vitsH}${photoH}
+         <button class="abtn ${meal.requiresPhoto?'primary':'simple'}" id="doneBtn_${meal.id}" ${canDone?'':'disabled'} onclick="markDone('${meal.id}')">✅ סיימתי</button>
+         ${meal.isLohamim&&photo ? `<button class="abtn wa" onclick="sendMealWA('${meal.id}')">📲 שלח ללביא בוואטסאפ</button>` : ''}`;
+
+    const div = document.createElement('div');
+    div.innerHTML = `<div class="card${done?' done':''}${meal.isLohamim?' lohamim-card':''}" id="card_${meal.id}">
+      <div class="card-header" onclick="toggleCard('${meal.id}')">
+        <div class="card-icon">${done?'✅':meal.icon}</div>
+        <div class="card-info">
+          <div class="card-name">${meal.name}</div>
+          <div class="card-meta">
+            <span class="card-time">⏰ ${meal.time}</span>
+            ${meal.kcal!=='—'?`<span class="card-kcal">${meal.kcal}</span>`:''}
+            ${badge}
+          </div>
+        </div>
+        <div class="card-check${done?' done':''}">${done?'✓':'○'}</div>
+      </div>
+      <div class="card-body" id="body_${meal.id}">${bodyH}</div>
+    </div>`;
+    c.appendChild(div);
+  });
+
+  // Upload section for admin
+  renderUploadSection(c);
+}
+
+function renderUploadSection(c) {
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="section-label">📋 תפריט חדש</div>
+    <div class="upload-menu-card">
+      <div class="upload-menu-title">העלאת תפריט חדש</div>
+      <div class="upload-menu-sub">AI יפרוט את הארוחות ויחליף את התפריט הנוכחי</div>
+      <div class="file-drop" onclick="document.getElementById('menuFileInput').click()">
+        <div class="drop-icon">📁</div>
+        <div class="drop-text">לחץ להעלאת תפריט</div>
+        <div class="drop-sub">תמונה (JPG/PNG) או PDF</div>
+      </div>
+      <div class="ai-status" id="aiStatus">⏳ הסוכן מנתח את התפריט...</div>
+    </div>`;
+  c.appendChild(div);
+}
+
+function toggleCard(id) { document.getElementById(`body_${id}`).classList.toggle('open'); }
+
+function updateProgress() {
+  if (!isAdmin()) return;
+  const done = Object.keys(state[todayKey].items).length;
+  const total = MENU.length;
+  document.getElementById('progressText').textContent = `${done} / ${total} פריטים`;
+  document.getElementById('progressFill').style.width = `${(done/total)*100}%`;
+}
+
+// ===================== PHOTO =====================
+function triggerMP(id) { curPhotoId=id; document.getElementById('mealPhotoInput').value=''; document.getElementById('mealPhotoInput').click(); }
+function handleMealPhoto(e) {
+  const f=e.target.files[0]; if(!f||!curPhotoId) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    state[todayKey].photos[curPhotoId]=ev.target.result; save();
+    renderAll(); updateProgress();
+    setTimeout(()=>{ const b=document.getElementById(`body_${curPhotoId}`); if(b) b.classList.add('open'); },60);
+    showToast('תמונה נשמרה ✅','green');
+  }; r.readAsDataURL(f);
+}
+function markDone(id) {
+  const meal=MENU.find(m=>m.id===id);
+  if(meal.requiresPhoto&&!state[todayKey].photos[id]){ showToast('חובה להעלות תמונה קודם 📸','gold'); return; }
+  state[todayKey].items[id]={time:new Date().toISOString()}; save(); updateProgress(); renderAll();
+  showToast(`${meal.name} — בוצע! 💪`,'green');
+  setTimeout(()=>{ const b=document.getElementById(`body_${id}`); if(b) b.classList.add('open'); },80);
+}
+function sendMealWA(id) {
+  window.open(`https://wa.me/${CONFIG.waRecipient}?text=${encodeURIComponent('בוצע')}`, '_blank');
+  showToast('וואטסאפ נפתח — שתף את התמונה 📲','gold');
+}
+function triggerWP(slot) { curWeighSlot=slot; document.getElementById('weighPhotoInput').value=''; document.getElementById('weighPhotoInput').click(); }
+function handleWeighPhoto(e) {
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    weighPhotos[curWeighSlot]=ev.target.result;
+    const el=document.getElementById(curWeighSlot==='front'?'frontSlot':'sideSlot');
+    el.classList.add('has-photo');
+    el.innerHTML=`<img src="${ev.target.result}"/><span style="position:relative;z-index:1;background:rgba(0,0,0,0.5);padding:2px 6px;border-radius:4px;font-size:10px;color:#fff">${curWeighSlot==='front'?'פרונטלי ✓':'צד ✓'}</span>`;
+    showToast('תמונה נשמרה ✅','green');
+  }; r.readAsDataURL(f);
+}
+function sendWeighWA() {
+  const w=document.getElementById('weightInput').value;
+  if(!w){ showToast('נא להכניס משקל 🔢','gold'); return; }
+  const d=new Date();
+  window.open(`https://wa.me/${CONFIG.waRecipient}?text=${encodeURIComponent(`📅 ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}\n⚖️ משקל: ${w} ק"ג\nבוצע`)}`, '_blank');
+  state[todayKey].weigh={weight:w,date:d.toISOString()}; save(); renderHistory();
+  showToast('נשלח ללביא! ⚖️','green');
+}
+
+// ===================== MENU UPLOAD + AI =====================
+async function handleMenuUpload(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const statusEl = document.getElementById('aiStatus');
+  statusEl.textContent = '⏳ הסוכן מנתח את התפריט...';
+  statusEl.classList.add('show');
+
+  try {
+    let base64, mediaType;
+    if (file.type === 'application/pdf') {
+      mediaType = 'application/pdf';
+    } else {
+      mediaType = file.type || 'image/jpeg';
+    }
+    base64 = await fileToBase64(file);
+
+    statusEl.textContent = '🤖 הסוכן בונה את התפריט החדש...';
+
+    const isPdf = file.type === 'application/pdf';
+    const contentBlock = isPdf
+      ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } }
+      : { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } };
+
+    const prompt = `אתה סוכן תזונה. קרא את התפריט המצורף והוצא ממנו את הארוחות העיקריות בלבד (3 עד 6 ארוחות, לא תוספים, לא ויטמינים, לא פרוטוקול).
+
+החזר JSON בלבד, ללא טקסט נוסף, במבנה הבא:
+[
+  {
+    "id": "meal1",
+    "time": "09:30",
+    "icon": "🥛",
+    "name": "שם הארוחה",
+    "kcal": "~400 kcal",
+    "type": "food",
+    "isLohamim": true,
+    "requiresPhoto": true,
+    "notify": "טקסט התראה קצר",
+    "items": [
+      {"l": "שם מרכיב", "v": "כמות"}
+    ]
+  }
+]
+
+חוקים:
+- type יכול להיות: food, drink
+- isLohamim: true לכל ארוחות האוכל הראשיות
+- requiresPhoto: true לכל ארוחה שdisLohamim=true
+- אל תכלול תוספים, ויטמינים, שתיות פרה-וורקאוט
+- id ייחודי לכל ארוחה: meal1, meal2, וכו׳`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: [contentBlock, { type: 'text', text: prompt }] }]
+      })
+    });
+
+    if (!response.ok) throw new Error(`API error: ${response.status}`);
+    const data = await response.json();
+    const text = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+    const newMeals = JSON.parse(clean);
+
+    if (!Array.isArray(newMeals) || newMeals.length === 0) throw new Error('לא נמצאו ארוחות');
+
+    // Archive old menu
+    const now = new Date();
+    const totalKcal = MENU.filter(m=>m.kcal&&m.kcal!=='—').map(m=>parseInt(m.kcal.replace(/[^0-9]/g,''))||0).reduce((a,b)=>a+b,0);
+    menuHistory.unshift({
+      date: now.toISOString(),
+      label: `תפריט ${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`,
+      meals: MENU.filter(m=>m.isLohamim).map(m=>({name:m.name,time:m.time,kcal:m.kcal})),
+      totalKcal
+    });
+    saveMenuHistory();
+
+    // Set new menu
+    MENU = newMeals;
+    saveMenu();
+
+    statusEl.textContent = `✅ תפריט חדש נטען! ${newMeals.length} ארוחות`;
+    renderAll();
+    updateProgress();
+    scheduleAll();
+
+    // Notify both users
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('פרויקט לוחמים 📋', {
+        body: `תפריט חדש עלה! ${newMeals.length} ארוחות נטענו`,
+        tag: 'new_menu'
+      });
+    }
+    showToast(`תפריט חדש! ${newMeals.length} ארוחות 🎉`, 'green');
+    renderHistory();
+
+  } catch(err) {
+    console.error(err);
+    statusEl.textContent = `❌ שגיאה: ${err.message}`;
+    showToast('שגיאה בניתוח התפריט ❌', 'gold');
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result.split(',')[1]);
+    r.onerror=()=>rej(new Error('קריאת קובץ נכשלה'));
+    r.readAsDataURL(file);
+  });
+}
+
+// ===================== SW =====================
+function registerSW() { if('serviceWorker'in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
+function checkNotify() {
+  if(!('Notification'in window)) return;
+  if(Notification.permission==='default') document.getElementById('notifyBanner').style.display='flex';
+}
+function requestNotifications() {
+  Notification.requestPermission().then(p=>{
+    document.getElementById('notifyBanner').style.display='none';
+    if(p==='granted'){ showToast('התראות הופעלו! 🔔','green'); scheduleAll(); }
+  });
+}
+function scheduleAll() {
+  if(!('Notification'in window)||Notification.permission!=='granted') return;
+  const now=new Date();
+  MENU.forEach(meal=>{
+    const [h,m]=meal.time.split(':').map(Number);
+    const pre=new Date(); pre.setHours(h,m,0,0); pre.setMinutes(pre.getMinutes()-15);
+    if(pre<=now) pre.setDate(pre.getDate()+1);
+    setTimeout(()=>new Notification('פרויקט לוחמים ⏰',{body:`בעוד 15 דקות — ${meal.name}`,tag:`pre_${meal.id}`}),pre-now);
+    const on=new Date(); on.setHours(h,m,0,0);
+    if(on<=now) on.setDate(on.getDate()+1);
+    setTimeout(()=>{
+      const tk=new Date().toISOString().split('T')[0];
+      if(!state[tk]?.items[meal.id]) new Notification('פרויקט לוחמים 🏆',{body:meal.notify||meal.name,tag:meal.id});
+    },on-now);
+  });
+  const wt=new Date(); wt.setHours(6,0,0,0); if(wt<=now) wt.setDate(wt.getDate()+1);
+  const wp=new Date(wt-15*60000);
+  if(wp>now) setTimeout(()=>new Notification('פרויקט לוחמים ⚖️',{body:'בעוד 15 דקות — שקילה + תמונות גוף! 📸',tag:'pre_weigh'}),wp-now);
+  setTimeout(()=>{ new Notification('פרויקט לוחמים ⚖️',{body:'06:00 — זמן לשקילה + 2 תמונות גוף! 📸',tag:'weigh'}); setTimeout(()=>scheduleAll(),61000); },wt-now);
+}
+
+// ===================== VIEWS =====================
+function switchView(v) {
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  if(v==='today'){ document.getElementById('viewToday').classList.add('active'); document.getElementById('navToday').classList.add('active'); }
+  else { document.getElementById('viewHistory').classList.add('active'); document.getElementById('navHistory').classList.add('active'); renderHistory(); }
+}
+
+// ===================== HISTORY =====================
+function renderHistory() {
+  const c = document.getElementById('historyContainer');
+  let html = '';
+
+  // Menu archive
+  if (menuHistory.length) {
+    html += `<div class="section-label">📋 תפריטים קודמים</div>`;
+    menuHistory.forEach((entry, idx) => {
+      const d = new Date(entry.date);
+      html += `
+        <div class="menu-archive-entry" onclick="toggleArchive(${idx})">
+          <div class="menu-archive-title">📋 ${entry.label}</div>
+          <div class="menu-archive-sub">${entry.meals.length} ארוחות • סה"כ ~${entry.totalKcal} kcal</div>
+          <div class="menu-archive-meals" id="archive_${idx}">
+            ${entry.meals.map(m=>`<div class="archive-meal-row">⏰ ${m.time} — ${m.name} (${m.kcal})</div>`).join('')}
+          </div>
+        </div>`;
+    });
+  }
+
+  // Daily history
+  const keys = Object.keys(state).sort().reverse();
+  if (keys.length) {
+    html += `<div class="section-label">📅 היסטוריה יומית</div>`;
+    keys.forEach(k => {
+      const day = state[k];
+      const done = Object.keys(day.items||{}).length;
+      const photos = Object.values(day.photos||{});
+      const [y,mo,d2] = k.split('-');
+      const doneNames = Object.keys(day.items||{}).map(id=>{ const m=MENU.find(x=>x.id===id); return m?m.name:id; });
+      html += `
+        <div class="history-entry">
+          <div class="history-header" onclick="this.nextElementSibling.classList.toggle('open')">
+            <div>
+              <div class="history-date">📅 ${d2}/${mo}/${y}</div>
+              <div class="history-meta">${done} / ${MENU.length} פריטים${day.weigh?` • ${day.weigh.weight} ק"ג`:''}</div>
+            </div>
+            <span style="color:var(--text-faint);font-size:12px">▼</span>
+          </div>
+          <div class="history-body">
+            ${doneNames.map(n=>`<div class="history-meal-row"><span>${n}</span><span style="color:var(--green)">✅</span></div>`).join('')}
+            ${photos.length?`<div class="history-photos">${photos.slice(0,6).map(p=>`<img src="${p}"/>`).join('')}</div>`:''}
+          </div>
+        </div>`;
+    });
+  }
+
+  if (!html) html = '<div class="history-empty">אין היסטוריה עדיין 📋</div>';
+  c.innerHTML = html;
+}
+
+function toggleArchive(idx) {
+  document.getElementById(`archive_${idx}`).classList.toggle('open');
+}
+
+// ===================== TOAST =====================
+function showToast(msg,type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+</script>
+</body>
+</html>
