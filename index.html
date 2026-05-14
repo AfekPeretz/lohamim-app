@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
 <meta name="theme-color" content="#0a0f1e"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="לוחמים"/>
@@ -12,719 +13,889 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --gold: #c9a84c;
-  --gold-light: #e8cc7a;
-  --gold-dim: rgba(201,168,76,0.15);
-  --navy: #0a0f1e;
-  --navy-mid: #111827;
-  --navy-card: #161d30;
-  --navy-border: rgba(201,168,76,0.2);
-  --text: #f0ead6;
-  --text-dim: rgba(240,234,214,0.55);
-  --green: #2ecc71;
-  --green-dim: rgba(46,204,113,0.15);
-  --red: #e74c3c;
+:root{
+  --gold:#c9a84c;--gold-light:#e8cc7a;--gold-dim:rgba(201,168,76,0.15);
+  --navy:#0a0f1e;--navy-card:#161d30;--navy-border:rgba(201,168,76,0.2);
+  --text:#f0ead6;--text-dim:rgba(240,234,214,0.55);--text-faint:rgba(240,234,214,0.3);
+  --green:#2ecc71;--green-dim:rgba(46,204,113,0.12);
+  --blue:#3498db;--blue-dim:rgba(52,152,219,0.12);
+  --purple:#9b59b6;--purple-dim:rgba(155,89,182,0.12);
+  --red:#e74c3c;--water:#3498db;
 }
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html,body { height:100%; background:var(--navy); color:var(--text); font-family:'Heebo',sans-serif; overflow-x:hidden; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--navy);color:var(--text);font-family:'Heebo',sans-serif;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 0%,rgba(201,168,76,0.07) 0%,transparent 55%),radial-gradient(ellipse at 80% 100%,rgba(201,168,76,0.04) 0%,transparent 50%);pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;max-width:430px;margin:0 auto;min-height:100vh;padding-bottom:100px;display:none;}
 
-/* BG pattern */
-body::before {
-  content:'';
-  position:fixed; inset:0;
-  background: radial-gradient(ellipse at 20% 0%, rgba(201,168,76,0.08) 0%, transparent 60%),
-              radial-gradient(ellipse at 80% 100%, rgba(201,168,76,0.05) 0%, transparent 50%);
-  pointer-events:none; z-index:0;
-}
-
-.app { position:relative; z-index:1; max-width:430px; margin:0 auto; min-height:100vh; padding-bottom:100px; }
+/* LOGIN */
+.login-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;background:var(--navy);}
+.login-box{background:var(--navy-card);border:1px solid var(--gold);border-radius:20px;padding:36px 28px;width:100%;max-width:360px;text-align:center;}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--gold);letter-spacing:3px;margin-bottom:4px;}
+.login-sub{font-size:12px;color:var(--text-dim);margin-bottom:28px;}
+.login-err{display:none;margin-bottom:14px;padding:12px 16px;background:linear-gradient(135deg,rgba(231,76,60,0.15),rgba(255,105,135,0.1));border:1px solid rgba(231,76,60,0.5);border-radius:10px;font-size:13px;color:#ff6b8a;font-weight:600;text-align:center;}
+.login-err.show{display:block;}
+.login-field{width:100%;padding:13px 16px;background:rgba(0,0,0,0.3);border:1px solid var(--navy-border);border-radius:10px;color:var(--text);font-size:15px;font-family:'Heebo',sans-serif;margin-bottom:12px;text-align:right;}
+.login-field:focus{outline:none;border-color:var(--gold);}
+.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;border-radius:10px;color:var(--navy);font-size:16px;font-weight:900;font-family:'Heebo',sans-serif;cursor:pointer;margin-top:4px;}
 
 /* HEADER */
-.header {
-  padding:24px 20px 16px;
-  border-bottom:1px solid var(--navy-border);
-  background:linear-gradient(180deg, rgba(10,15,30,0.98) 0%, transparent 100%);
-  position:sticky; top:0; z-index:100;
-  backdrop-filter:blur(20px);
-}
-.header-top { display:flex; justify-content:space-between; align-items:center; }
-.logo { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--gold); letter-spacing:2px; }
-.logo span { color:var(--text-dim); font-size:13px; font-family:'Heebo',sans-serif; font-weight:300; letter-spacing:0; display:block; margin-top:-4px; }
-.date-chip {
-  background:var(--gold-dim); border:1px solid var(--navy-border);
-  border-radius:20px; padding:6px 14px;
-  font-size:12px; color:var(--gold-light); font-weight:500;
-}
-.progress-bar-wrap { margin-top:14px; }
-.progress-label { display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim); margin-bottom:6px; }
-.progress-track { height:4px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden; }
-.progress-fill { height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-light)); border-radius:4px; transition:width 0.6s cubic-bezier(.4,0,.2,1); }
+.header{padding:16px 16px 12px;border-bottom:1px solid var(--navy-border);background:rgba(10,15,30,0.97);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);}
+.header-top{display:flex;justify-content:space-between;align-items:center;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);letter-spacing:2px;}
+.logo span{color:var(--text-dim);font-size:11px;font-family:'Heebo',sans-serif;font-weight:300;letter-spacing:0;display:block;margin-top:-3px;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.date-chip{background:var(--gold-dim);border:1px solid var(--navy-border);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--gold-light);font-weight:500;}
+.user-chip{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--green);font-weight:700;cursor:pointer;}
+.progress-bar-wrap{margin-top:10px;}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:4px;}
+.progress-track{height:3px;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:4px;transition:width 0.6s cubic-bezier(.4,0,.2,1);}
+.section-label{font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;padding:16px 14px 6px;font-weight:700;}
 
-/* SECTION LABEL */
-.section-label {
-  font-size:10px; letter-spacing:2px; color:var(--gold);
-  text-transform:uppercase; padding:20px 20px 8px;
-  font-weight:700;
-}
+/* WATER */
+.water-card{margin:0 10px 8px;background:linear-gradient(135deg,rgba(52,152,219,0.1),rgba(52,152,219,0.05));border:1px solid rgba(52,152,219,0.3);border-radius:14px;padding:14px 16px;}
+.water-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.water-title{font-size:14px;font-weight:700;color:var(--text);}
+.water-count{font-size:13px;color:var(--blue);font-weight:700;}
+.water-track{height:10px;background:rgba(255,255,255,0.07);border-radius:10px;overflow:hidden;margin-bottom:10px;}
+.water-fill{height:100%;background:linear-gradient(90deg,#3498db,#5dade2);border-radius:10px;transition:width 0.4s ease;}
+.water-cups{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.water-cup{font-size:20px;cursor:pointer;opacity:0.3;transition:all 0.2s;filter:grayscale(1);}
+.water-cup.filled{opacity:1;filter:grayscale(0);transform:scale(1.1);}
+.water-btn{padding:8px 16px;background:rgba(52,152,219,0.2);border:1px solid rgba(52,152,219,0.4);border-radius:8px;color:var(--blue);font-size:12px;font-weight:700;font-family:'Heebo',sans-serif;cursor:pointer;}
+.water-btn.remove{background:rgba(231,76,60,0.1);border-color:rgba(231,76,60,0.3);color:var(--red);}
+.water-btns{display:flex;gap:8px;}
 
-/* MEAL CARD */
-.meal-card {
-  margin:0 12px 10px;
-  background:var(--navy-card);
-  border:1px solid var(--navy-border);
-  border-radius:16px;
-  overflow:hidden;
-  transition:transform 0.2s, box-shadow 0.2s;
-}
-.meal-card.done { border-color:rgba(46,204,113,0.3); }
-.meal-card.done .meal-header { opacity:0.6; }
+/* CARDS */
+.card{background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;overflow:hidden;margin:0 10px 8px;transition:border-color 0.3s;}
+.card.done{border-color:rgba(46,204,113,0.25);}
+.card.lohamim-card{border-color:rgba(201,168,76,0.4);}
+.card.lohamim-card.done{border-color:rgba(46,204,113,0.35);}
+.card-header{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;}
+.card-icon{width:40px;height:40px;border-radius:10px;background:var(--gold-dim);border:1px solid var(--navy-border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;transition:all 0.3s;}
+.card.done .card-icon{background:var(--green-dim);border-color:rgba(46,204,113,0.25);}
+.card-info{flex:1;min-width:0;}
+.card-name{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;}
+.card-meta{display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap;}
+.card-time{font-size:11px;color:var(--gold);font-weight:500;}
+.card-kcal{font-size:11px;color:var(--text-faint);}
+.badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:0.5px;}
+.badge-l{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,168,76,0.3);}
+.badge-d{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(52,152,219,0.2);}
+.badge-v{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(155,89,182,0.2);}
+.card-check{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--navy-border);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:all 0.3s;color:var(--text-faint);}
+.card.done .card-check{background:var(--green);border-color:var(--green);color:#fff;}
+.card-body{padding:0 14px 14px;display:none;}
+.card-body.open{display:block;}
+.ir{display:flex;justify-content:space-between;align-items:flex-start;font-size:12px;color:var(--text-dim);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);gap:8px;}
+.ir:last-child{border:none;}
+.ir .v{color:var(--text);font-weight:500;text-align:left;flex-shrink:0;}
+.vit-sec{margin-top:10px;padding-top:10px;border-top:1px solid rgba(155,89,182,0.2);}
+.vit-lbl{font-size:10px;color:var(--purple);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.vit-item{font-size:11px;color:var(--text-dim);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);display:flex;align-items:flex-start;gap:5px;}
+.vit-item:last-child{border:none;}
+.vit-item::before{content:'💊';font-size:10px;flex-shrink:0;}
+.vit-note{font-size:10px;color:var(--text-faint);font-style:italic;margin-top:5px;}
+.photo-sec{margin-top:10px;}
+.photo-lbl{font-size:10px;color:var(--gold);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.photo-lbl::before{content:'📸 ';}
+.upload-btn{width:100%;padding:11px;background:var(--gold-dim);border:1.5px dashed var(--gold);border-radius:10px;color:var(--gold-light);font-size:12px;font-family:'Heebo',sans-serif;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.photo-prev{width:100%;height:150px;border-radius:10px;object-fit:cover;border:1px solid var(--navy-border);display:none;}
+.photo-prev.show{display:block;}
+.abtn{width:100%;margin-top:10px;padding:13px;border:none;border-radius:10px;font-size:14px;font-weight:900;font-family:'Heebo',sans-serif;cursor:pointer;transition:all 0.2s;}
+.abtn:active{transform:scale(0.97);}
+.abtn.primary{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);}
+.abtn.primary:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+.abtn.wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-size:13px;margin-top:6px;}
+.abtn.simple{background:var(--green-dim);color:var(--green);border:1px solid rgba(46,204,113,0.3);}
+.done-banner{text-align:center;color:var(--green);font-weight:700;font-size:13px;padding:8px 0;}
 
-.meal-header {
-  display:flex; align-items:center; gap:14px;
-  padding:16px;
-  cursor:pointer;
-}
-.meal-icon {
-  width:44px; height:44px; border-radius:12px;
-  background:var(--gold-dim); border:1px solid var(--navy-border);
-  display:flex; align-items:center; justify-content:center;
-  font-size:22px; flex-shrink:0;
-}
-.meal-icon.done-icon { background:var(--green-dim); border-color:rgba(46,204,113,0.3); }
-.meal-info { flex:1; min-width:0; }
-.meal-name { font-size:15px; font-weight:700; color:var(--text); }
-.meal-time { font-size:12px; color:var(--gold); margin-top:2px; }
-.meal-kcal { font-size:11px; color:var(--text-dim); margin-top:1px; }
-.meal-status {
-  width:32px; height:32px; border-radius:50%;
-  border:2px solid var(--navy-border);
-  display:flex; align-items:center; justify-content:center;
-  font-size:14px; flex-shrink:0;
-  transition:all 0.3s;
-}
-.meal-status.done { background:var(--green); border-color:var(--green); }
+/* WEIGH */
+.weigh-card{margin:0 10px 8px;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03));border:1px solid var(--gold);border-radius:14px;padding:16px;}
+.weigh-title{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);letter-spacing:1px;margin-bottom:2px;}
+.weigh-sub{font-size:11px;color:var(--text-dim);margin-bottom:12px;}
+.weigh-row{display:flex;gap:8px;margin-bottom:10px;}
+.weigh-input{flex:1;padding:11px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--navy-border);border-radius:8px;color:var(--text);font-size:16px;font-family:'Heebo',sans-serif;text-align:center;}
+.weigh-input:focus{outline:none;border-color:var(--gold);}
+.weigh-unit{display:flex;align-items:center;padding:0 10px;color:var(--gold);font-weight:700;font-size:14px;}
+.photo-row{display:flex;gap:8px;margin-bottom:10px;}
+.photo-slot{flex:1;height:80px;border-radius:10px;background:rgba(0,0,0,0.3);border:1.5px dashed var(--navy-border);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--text-dim);gap:3px;cursor:pointer;transition:border-color 0.2s;overflow:hidden;position:relative;}
+.photo-slot.has-photo{border-style:solid;border-color:var(--gold);}
+.photo-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.photo-slot span{position:relative;z-index:1;}
 
-/* MEAL BODY */
-.meal-body { padding:0 16px 16px; display:none; }
-.meal-body.open { display:block; }
-.meal-items { margin-bottom:14px; }
-.meal-item {
-  display:flex; justify-content:space-between;
-  font-size:13px; color:var(--text-dim);
-  padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.05);
-}
-.meal-item:last-child { border:none; }
-.meal-item strong { color:var(--text); }
+/* UPLOAD MENU */
+.upload-menu-card{margin:0 10px 8px;background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;padding:16px;}
+.upload-menu-title{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;margin-bottom:4px;}
+.upload-menu-sub{font-size:11px;color:var(--text-dim);margin-bottom:12px;}
+.file-drop{width:100%;padding:20px;background:rgba(0,0,0,0.2);border:1.5px dashed var(--navy-border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-align:center;}
+.file-drop .drop-icon{font-size:28px;}
+.file-drop .drop-text{font-size:13px;color:var(--text-dim);}
+.file-drop .drop-sub{font-size:11px;color:var(--text-faint);}
+.ai-status{margin-top:10px;padding:10px 14px;background:rgba(155,89,182,0.1);border:1px solid rgba(155,89,182,0.3);border-radius:8px;font-size:12px;color:var(--purple);display:none;}
+.ai-status.show{display:block;}
 
-/* PHOTO REQUIRED */
-.photo-section { margin-top:4px; }
-.photo-required-label {
-  font-size:11px; color:var(--gold); font-weight:700;
-  letter-spacing:1px; text-transform:uppercase; margin-bottom:8px;
-  display:flex; align-items:center; gap:6px;
-}
-.photo-required-label::before { content:'📸'; }
-.photo-upload-btn {
-  width:100%; padding:12px;
-  background:var(--gold-dim); border:1.5px dashed var(--gold);
-  border-radius:12px; color:var(--gold-light);
-  font-size:13px; font-family:'Heebo',sans-serif; font-weight:500;
-  cursor:pointer; transition:all 0.2s;
-  display:flex; align-items:center; justify-content:center; gap:8px;
-}
-.photo-upload-btn:active { transform:scale(0.98); }
-.photo-preview {
-  width:100%; height:160px; border-radius:12px;
-  object-fit:cover; border:1px solid var(--navy-border); display:none;
-}
-.photo-preview.visible { display:block; }
+/* LAVI VIEW */
+.lavi-meal-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;margin:0 10px 8px;}
+.lavi-meal-name{font-size:15px;font-weight:700;color:var(--text);}
+.lavi-meal-time{font-size:11px;color:var(--gold);margin-top:2px;}
+.lavi-check{width:36px;height:36px;border-radius:50%;border:2px solid var(--navy-border);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.lavi-check.done{background:var(--green);border-color:var(--green);color:#fff;}
+.lavi-check.notdone{color:var(--text-faint);}
 
-/* DONE BTN */
-.done-btn {
-  width:100%; margin-top:12px; padding:14px;
-  background:linear-gradient(135deg,var(--gold),var(--gold-light));
-  border:none; border-radius:12px;
-  color:var(--navy); font-size:15px; font-weight:900;
-  font-family:'Heebo',sans-serif; cursor:pointer;
-  transition:all 0.2s; letter-spacing:0.5px;
-}
-.done-btn:active { transform:scale(0.97); }
-.done-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
-.done-btn.whatsapp { background:linear-gradient(135deg,#25d366,#128c7e); color:#fff; margin-top:8px; font-size:13px; }
+/* NOTIFY */
+.notify-banner{margin:10px 10px 0;background:rgba(201,168,76,0.08);border:1px solid var(--gold);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.notify-banner p{flex:1;font-size:12px;color:var(--text);line-height:1.5;}
+.notify-btn{padding:8px 14px;background:var(--gold);border:none;border-radius:8px;color:var(--navy);font-weight:700;font-family:'Heebo',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;}
 
-/* WEIGH CARD */
-.weigh-card {
-  margin:0 12px 10px;
-  background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(201,168,76,0.05));
-  border:1px solid var(--gold);
-  border-radius:16px; padding:18px;
-}
-.weigh-title { font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--gold); letter-spacing:1px; margin-bottom:4px; }
-.weigh-sub { font-size:12px; color:var(--text-dim); margin-bottom:14px; }
-.weigh-input-row { display:flex; gap:10px; margin-bottom:12px; }
-.weigh-input {
-  flex:1; padding:12px 14px;
-  background:rgba(0,0,0,0.3); border:1px solid var(--navy-border);
-  border-radius:10px; color:var(--text); font-size:16px;
-  font-family:'Heebo',sans-serif; text-align:center;
-}
-.weigh-input:focus { outline:none; border-color:var(--gold); }
-.weigh-unit { display:flex; align-items:center; padding:0 12px; color:var(--gold); font-weight:700; }
-.photo-row { display:flex; gap:8px; margin-bottom:12px; }
-.photo-slot {
-  flex:1; height:90px; border-radius:10px;
-  background:rgba(0,0,0,0.3); border:1.5px dashed var(--navy-border);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  font-size:11px; color:var(--text-dim); gap:4px; cursor:pointer;
-  transition:border-color 0.2s; overflow:hidden; position:relative;
-}
-.photo-slot.has-photo { border-style:solid; border-color:var(--gold); }
-.photo-slot img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-.photo-slot span { position:relative; z-index:1; }
+/* GALLERY */
+.gallery-folder{margin:0 10px 10px;background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;overflow:hidden;}
+.gallery-folder-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;}
+.gallery-folder-title{font-size:14px;font-weight:700;color:var(--text);}
+.gallery-folder-sub{font-size:11px;color:var(--text-dim);margin-top:2px;}
+.gallery-grid{display:none;grid-template-columns:repeat(3,1fr);gap:2px;padding:0 2px 12px;}
+.gallery-grid.open{display:grid;}
+.gallery-item{position:relative;aspect-ratio:1;overflow:hidden;}
+.gallery-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.gallery-item-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.65);font-size:9px;color:#fff;padding:3px 5px;text-align:center;line-height:1.3;}
+.gallery-item-del{position:absolute;top:4px;right:4px;background:rgba(231,76,60,0.85);border:none;border-radius:50%;width:22px;height:22px;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.gallery-empty{text-align:center;padding:40px 20px;color:var(--text-dim);font-size:13px;}
 
-/* NOTIFY PERMISSION */
-.notify-banner {
-  margin:12px 12px 0;
-  background:rgba(201,168,76,0.1); border:1px solid var(--gold);
-  border-radius:14px; padding:14px 16px;
-  display:flex; align-items:center; gap:12px;
-}
-.notify-banner p { flex:1; font-size:13px; color:var(--text); line-height:1.5; }
-.notify-btn {
-  padding:9px 16px; background:var(--gold); border:none;
-  border-radius:8px; color:var(--navy); font-weight:700;
-  font-family:'Heebo',sans-serif; font-size:13px; cursor:pointer; white-space:nowrap;
-}
-
-/* TOAST */
-.toast {
-  position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
-  background:var(--navy-card); border:1px solid var(--navy-border);
-  border-radius:12px; padding:12px 20px;
-  font-size:13px; color:var(--text); z-index:999;
-  opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap;
-}
-.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-.toast.gold { border-color:var(--gold); color:var(--gold); }
-.toast.green { border-color:var(--green); color:var(--green); }
-
-/* BOTTOM NAV */
-.bottom-nav {
-  position:fixed; bottom:0; left:0; right:0;
-  background:rgba(10,15,30,0.95); backdrop-filter:blur(20px);
-  border-top:1px solid var(--navy-border);
-  display:flex; max-width:430px; margin:0 auto;
-}
-.nav-item {
-  flex:1; display:flex; flex-direction:column; align-items:center;
-  padding:10px 0 14px; gap:4px; cursor:pointer;
-  font-size:10px; color:var(--text-dim); font-weight:500;
-  transition:color 0.2s;
-}
-.nav-item.active { color:var(--gold); }
-.nav-item .nav-icon { font-size:20px; }
-
-/* VIEWS */
-.view { display:none; }
-.view.active { display:block; }
+/* PROFILE */
+.profile-photo-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 0 10px;}
+.profile-photo{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--gold);background:var(--navy-card);display:flex;align-items:center;justify-content:center;font-size:40px;cursor:pointer;overflow:hidden;position:relative;}
+.profile-photo img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.profile-photo-edit{font-size:11px;color:var(--gold);margin-top:8px;cursor:pointer;}
+.profile-name-display{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--text);margin-top:6px;letter-spacing:1px;}
+.profile-card{margin:0 10px 10px;background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;padding:16px;}
+.profile-card-title{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;}
+.profile-field{margin-bottom:12px;}
+.profile-label{font-size:11px;color:var(--text-dim);margin-bottom:4px;}
+.profile-value{font-size:15px;color:var(--text);font-weight:500;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);min-height:28px;}
+.profile-input{width:100%;padding:10px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--gold);border-radius:8px;color:var(--text);font-size:15px;font-family:'Heebo',sans-serif;}
+.profile-input:focus{outline:none;border-color:var(--gold-light);}
+.profile-textarea{width:100%;padding:10px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--gold);border-radius:8px;color:var(--text);font-size:14px;font-family:'Heebo',sans-serif;min-height:80px;resize:vertical;}
+.profile-textarea:focus{outline:none;border-color:var(--gold-light);}
+.profile-edit-btn{display:block;width:calc(100% - 20px);margin:0 10px;padding:12px;background:var(--gold-dim);border:1px solid var(--gold);border-radius:10px;color:var(--gold-light);font-size:14px;font-weight:700;font-family:'Heebo',sans-serif;cursor:pointer;text-align:center;}
+.profile-save-btn{display:block;width:calc(100% - 20px);margin:0 10px;padding:12px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:900;font-family:'Heebo',sans-serif;cursor:pointer;}
+.profile-chart-wrap{margin:12px 10px 10px;background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;padding:16px;}
+.profile-chart-title{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;}
 
 /* HISTORY */
-.history-empty { text-align:center; padding:60px 20px; color:var(--text-dim); font-size:14px; }
-.history-entry {
-  margin:0 12px 10px; padding:14px 16px;
-  background:var(--navy-card); border:1px solid var(--navy-border);
-  border-radius:14px;
-}
-.history-date { font-size:11px; color:var(--gold); font-weight:700; margin-bottom:6px; }
-.history-row { display:flex; justify-content:space-between; font-size:13px; color:var(--text-dim); padding:2px 0; }
-.history-photos { display:flex; gap:8px; margin-top:8px; }
-.history-photos img { width:60px; height:60px; border-radius:8px; object-fit:cover; }
+.history-entry{margin:0 10px 8px;background:var(--navy-card);border:1px solid var(--navy-border);border-radius:14px;overflow:hidden;}
+.history-header{padding:14px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.history-date{font-size:13px;color:var(--gold);font-weight:700;}
+.history-meta{font-size:11px;color:var(--text-dim);margin-top:2px;}
+.history-body{padding:0 16px 14px;display:none;}
+.history-body.open{display:block;}
+.history-meal-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.history-meal-row:last-child{border:none;}
+.history-photos{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.history-photos img{width:55px;height:55px;border-radius:7px;object-fit:cover;}
+.history-empty{text-align:center;padding:50px 20px;color:var(--text-dim);font-size:14px;}
+.menu-archive-entry{margin:0 10px 8px;background:rgba(155,89,182,0.08);border:1px solid rgba(155,89,182,0.3);border-radius:12px;padding:12px 14px;cursor:pointer;}
+.menu-archive-title{font-size:13px;font-weight:700;color:var(--purple);margin-bottom:4px;}
+.menu-archive-sub{font-size:11px;color:var(--text-dim);}
+.menu-archive-meals{margin-top:8px;padding-top:8px;border-top:1px solid rgba(155,89,182,0.2);display:none;}
+.menu-archive-meals.open{display:block;}
+.archive-meal-row{font-size:12px;color:var(--text-dim);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+
+/* TOAST */
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--navy-card);border:1px solid var(--navy-border);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--text);z-index:9999;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.gold{border-color:var(--gold);color:var(--gold);}
+.toast.green{border-color:var(--green);color:var(--green);}
+.toast.blue{border-color:var(--blue);color:var(--blue);}
+
+/* NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,15,30,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--navy-border);display:flex;max-width:430px;margin:0 auto;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 0 13px;gap:3px;cursor:pointer;font-size:10px;color:var(--text-dim);font-weight:500;transition:color 0.2s;}
+.nav-item.active{color:var(--gold);}
+.ni{font-size:19px;}
+.view{display:none;}
+.view.active{display:block;}
 </style>
 </head>
 <body>
 
-<div class="app">
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">⚔️ לוחמים</div>
+    <div class="login-sub">פרויקט לוחמים — Alpha Protocol</div>
+    <div class="login-err" id="loginErr">⚠️ שם משתמש או סיסמא שגויים</div>
+    <input class="login-field" type="text" id="loginUser" placeholder="שם משתמש" autocomplete="username"/>
+    <input class="login-field" type="password" id="loginPass" placeholder="סיסמא" autocomplete="current-password"/>
+    <button class="login-btn" onclick="doLogin()">כניסה</button>
+  </div>
+</div>
 
-  <!-- NOTIFY BANNER -->
+<!-- APP -->
+<div class="app" id="appWrap">
   <div class="notify-banner" id="notifyBanner" style="display:none">
-    <span style="font-size:24px">🔔</span>
-    <p>אפשר התראות כדי לקבל תזכורות לארוחות ושקילה</p>
+    <span style="font-size:22px">🔔</span>
+    <p>אפשר התראות לקבל תזכורות לכל הארוחות</p>
     <button class="notify-btn" onclick="requestNotifications()">אישור</button>
   </div>
 
-  <!-- VIEW: TODAY -->
+  <!-- TODAY -->
   <div class="view active" id="viewToday">
     <div class="header">
       <div class="header-top">
         <div class="logo">פרויקט לוחמים <span>Alpha Protocol</span></div>
-        <div class="date-chip" id="dateChip"></div>
-      </div>
-      <div class="progress-bar-wrap">
-        <div class="progress-label">
-          <span>התקדמות יומית</span>
-          <span id="progressText">0 / 4 ארוחות</span>
+        <div class="header-right">
+          <div class="date-chip" id="dateChip"></div>
+          <div class="user-chip" id="userChip" onclick="doLogout()">יציאה</div>
         </div>
+      </div>
+      <div class="progress-bar-wrap" id="progressWrap">
+        <div class="progress-label"><span>התקדמות יומית</span><span id="progressText">0 / 0</span></div>
         <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
       </div>
     </div>
-
-    <!-- WEIGH CARD -->
-    <div class="section-label">⚖️ שקילה יומית</div>
-    <div class="weigh-card" id="weighCard">
-      <div class="weigh-title">שקילה + תמונות גוף</div>
-      <div class="weigh-sub">כל יום 06:00 — בלי חולצה</div>
-      <div class="weigh-input-row">
-        <input class="weigh-input" type="number" id="weightInput" placeholder="75.5" step="0.1" min="40" max="200"/>
-        <div class="weigh-unit">ק"ג</div>
-      </div>
-      <div class="photo-row">
-        <div class="photo-slot" id="frontSlot" onclick="triggerWeighPhoto('front')">
-          <span style="font-size:22px">📸</span>
-          <span>פרונטלי</span>
-        </div>
-        <div class="photo-slot" id="sideSlot" onclick="triggerWeighPhoto('side')">
-          <span style="font-size:22px">📸</span>
-          <span>צד</span>
-        </div>
-      </div>
-      <input type="file" id="weighPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleWeighPhoto(event)"/>
-      <button class="done-btn" onclick="sendWeighToWhatsApp()">שלח לאפק ⚡</button>
-    </div>
-
-    <!-- MEALS -->
-    <div class="section-label">🍽️ ארוחות היום</div>
-    <div id="mealsContainer"></div>
-
-    <!-- hidden file input for meal photos -->
+    <div id="mainContainer"></div>
     <input type="file" id="mealPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleMealPhoto(event)"/>
+    <input type="file" id="weighPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleWeighPhoto(event)"/>
+    <input type="file" id="menuFileInput" accept="image/*,.pdf" style="display:none" onchange="handleMenuUpload(event)"/>
   </div>
 
-  <!-- VIEW: HISTORY -->
+  <!-- HISTORY -->
   <div class="view" id="viewHistory">
     <div class="header">
       <div class="header-top">
-        <div class="logo">היסטוריה <span>מעקב שבועי</span></div>
+        <div class="logo">היסטוריה <span>מעקב יומי</span></div>
+        <div class="user-chip" id="userChip2" onclick="doLogout()">יציאה</div>
       </div>
     </div>
     <div id="historyContainer" style="padding-top:8px"></div>
   </div>
 
-  <!-- BOTTOM NAV -->
+  <!-- GALLERY -->
+  <div class="view" id="viewGallery">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo">ספרייה <span>תמונות</span></div>
+        <div class="user-chip" id="userChip3" onclick="doLogout()">יציאה</div>
+      </div>
+    </div>
+    <div id="galleryContainer" style="padding-top:8px"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="view" id="viewProfile">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo">פרופיל <span>הנתונים שלי</span></div>
+        <div class="user-chip" id="userChip4" onclick="doLogout()">יציאה</div>
+      </div>
+    </div>
+    <div id="profileContainer" style="padding-top:8px;padding-bottom:20px"></div>
+    <input type="file" id="profilePhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleProfilePhoto(event)"/>
+  </div>
+
   <div class="bottom-nav">
-    <div class="nav-item active" id="navToday" onclick="switchView('today')">
-      <div class="nav-icon">🏠</div>
-      <span>היום</span>
-    </div>
-    <div class="nav-item" id="navHistory" onclick="switchView('history')">
-      <div class="nav-icon">📊</div>
-      <span>היסטוריה</span>
-    </div>
+    <div class="nav-item active" id="navToday" onclick="switchView('today')"><div class="ni">🏠</div><span>היום</span></div>
+    <div class="nav-item" id="navHistory" onclick="switchView('history')"><div class="ni">📊</div><span>היסטוריה</span></div>
+    <div class="nav-item" id="navGallery" onclick="switchView('gallery')"><div class="ni">🖼️</div><span>ספרייה</span></div>
+    <div class="nav-item" id="navProfile" onclick="switchView('profile')"><div class="ni">👤</div><span>פרופיל</span></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ===================== DATA =====================
-const MEALS = [
-  {
-    id: 'pre',
-    name: 'לפני אימון — פרי + קפה',
-    time: '06:00',
-    icon: '🍎',
-    kcal: '~90 kcal',
-    requiresPhoto: false,
-    notifyText: 'זמן לפרי + קפה לפני אימון! ☕🍎',
-    items: [
-      { label: 'תפוח / בננה / תפוז / קלמנטינה', val: '1 יחידה' },
-      { label: 'קפה שחור / אספרסו', val: 'לפי בחירה' }
-    ]
+// ===== CONFIG =====
+const CONFIG = {
+  users: {
+    Afek: { password: 'afek29', phone: '972542580471', role: 'admin' },
+    Lavi: { password: 'Lavi1234', phone: '972509060929', role: 'viewer' }
   },
-  {
-    id: 'meal1',
-    name: 'ארוחה 1 — שייק + שקדים',
-    time: '09:30',
-    icon: '🥛',
-    kcal: '~445 kcal',
-    requiresPhoto: true,
-    notifyText: 'ארוחה 1! שייק חלבון + פרי + שקדים 💪',
-    items: [
-      { label: 'מעדן חלבון / סקופ חלבון', val: '30g חלבון' },
-      { label: 'פרי 1', val: 'תפוח / תמרים / קלמנטינה / בננה' },
-      { label: 'שקדים', val: '30g' }
-    ]
-  },
-  {
-    id: 'meal2',
-    name: 'ארוחה 2 — צהריים',
-    time: '13:45',
-    icon: '🍗',
-    kcal: '~720 kcal',
-    requiresPhoto: true,
-    notifyText: 'ארוחת צהריים! עוף / בשר / דג + פחמימה 🍗🍚',
-    items: [
-      { label: 'חזה עוף / שייטל / דג אמנון', val: '200g' },
-      { label: 'פסטה יבש / אורז מבושל', val: '150g / 200g' },
-      { label: 'ברוקולי + שעועית ירוקה + ירקות', val: '100g+100g' },
-      { label: 'מיץ אשכולית סחוט', val: '250ml' }
-    ]
-  },
-  {
-    id: 'meal3',
-    name: 'ארוחה 3 — טונה + סלט',
-    time: '20:30',
-    icon: '🥗',
-    kcal: '~260 kcal',
-    requiresPhoto: true,
-    notifyText: 'ארוחה 3! טונה + סלט 🐟🥗',
-    items: [
-      { label: 'טונה במים', val: '160g (1 פחית)' },
-      { label: 'סלט ירקות', val: '3–4 סוגים' },
-      { label: 'קטשופ + מיונז', val: 'כף כל אחד' }
-    ]
-  },
-  {
-    id: 'meal4',
-    name: 'ארוחה 4 — ביצים + קוטג׳',
-    time: '21:00',
-    icon: '🍳',
-    kcal: '~430 kcal',
-    requiresPhoto: true,
-    notifyText: 'ארוחה 4! ביצים + קוטג׳ + פריכיות 🍳',
-    items: [
-      { label: '3 ביצים שלמות', val: '~210 kcal' },
-      { label: 'קוטג׳ 5%', val: '150g' },
-      { label: 'פריכיות', val: '5 יח׳' },
-      { label: '2 ירקות לבחירה', val: '200g' }
-    ]
-  }
+  anthropicKey: 'REPLACE_WITH_KEY',
+  waRecipient: '972509060929'
+};
+
+// ===== MENU =====
+const DEFAULT_MENU = [
+  {id:'alpha_elixir',time:'04:00',icon:'💧',name:'Alpha Elixir',kcal:'~55 kcal',type:'drink',isLohamim:false,requiresPhoto:false,notify:'Alpha Elixir — הידרציה! 💧',
+   items:[{l:'מים + מי קוקוס 200ml (50/50)',v:'בסיס'},{l:'קמצוץ מלח הימלאי + ACV 1 כף',v:'בקשית'},{l:'קריאטין 5g (מנה 1)',v:'1 scoop'},{l:'Thorne אלקטרוליטים',v:'1 stick'}],
+   vitamins:['B12 סאבלינגואל (1 טבלית)','NMN 175mg (1 קפסולה)','TMG 1000mg (1 טבלית)','L-Arginine 1000mg (1 טבלית)',"Lion's Mane (1 קפסולה) — מנה 1"],vitNote:'* על קיבה ריקה'},
+  {id:'pre_run',time:'05:30',icon:'☕',name:'Pre-Run Coffee',kcal:'~120 kcal',type:'drink',isLohamim:false,requiresPhoto:false,notify:'Pre-Run Coffee — קפה + MCT! ☕',
+   items:[{l:'קפה שחור',v:'~2 kcal'},{l:'שמן MCT',v:'1 כף (14g)'}],
+   vitamins:['L-Tyrosine 500mg (1 קפסולה — NOW Foods)']},
+  {id:'pre_gym',time:'06:00',icon:'⚡',name:'Pre-Gym Fuel + פרי',kcal:'~105 kcal',type:'food',isLohamim:false,requiresPhoto:false,notify:'Pre-Gym — Pump Stack + פרי! ⚡🍎',
+   items:[{l:'C4 Sport',v:'1 scoop'},{l:'L-Citrulline',v:'4 קפסולות (3000mg)'},{l:'Beta-Alanine',v:'3g'},{l:'תפוח / בננה / תפוז / קלמנטינה',v:'1 יחידה'}],
+   vitamins:['Shilajit (1 קפסולה)','Cordyceps (1 קפסולה / 1 scoop אבקה)']},
+  {id:'intra',time:'08:00',icon:'🏋️',name:'Intra-Workout',kcal:'~110 kcal',type:'drink',isLohamim:false,requiresPhoto:false,notify:'Intra-Workout — EAA + Cluster Dextrin! 💪',
+   items:[{l:'EAA',v:'1 scoop'},{l:'Cluster Dextrin — NutraBio Pineapple',v:'1 scoop (25g)'}]},
+  {id:'meal1',time:'09:30',icon:'🥛',name:'ארוחה 1 — שייק + שקדים',kcal:'~445 kcal',type:'food',isLohamim:true,requiresPhoto:true,notify:'ארוחה 1 — שייק חלבון + פרי + שקדים! 🥛💪',
+   items:[{l:'מעדן חלבון / סקופ חלבון',v:'30g חלבון'},{l:'פרי 1',v:'תפוח / תמרים / קלמנטינה / בננה'},{l:'שקדים',v:'30g'}],
+   vitamins:['קריאטין 5g — מנה 2 (1 scoop)','Sunflower Lecithin (1 scoop — Microingredients)','Maca Root (2 קפסולות — Bronson Extract)','Moringa (1 כפית אבקה)']},
+  {id:'fat_window',time:'11:00',icon:'🧬',name:'Fat & Vitamin Window',kcal:'—',type:'vitamins',isLohamim:false,requiresPhoto:false,notify:'11:00 — ויטמינים עם שומן! 🧬',
+   items:[],vitamins:['Vit D3 + K2 (4 טיפות — נוזלי)','Omega-3 (1 קפסולה) — מנה 1','Vit E-400 (1 softgel — NOW Foods)','Tongkat Ali 400mg (1 קפסולה)','Ashwagandha (1 קפסולה)',"Lion's Mane (1 קפסולה) — מנה 2"],
+   vitNote:'* עם שומן — שקדים מארוחה 1 מספיקים'},
+  {id:'meal2',time:'13:45',icon:'🍗',name:'ארוחה 2 — צהריים',kcal:'~720 kcal',type:'food',isLohamim:true,requiresPhoto:true,notify:'ארוחה 2 — Zinc Window! עוף + פחמימה 🍗🍚',
+   items:[{l:'חזה עוף / שייטל / דג אמנון',v:'200g'},{l:'פסטה יבש / אורז מבושל',v:'150g / 200g'},{l:'ברוקולי + שעועית ירוקה + ירקות',v:'100g+100g'},{l:'שמן/בישול',v:'~50 kcal'},{l:'🍊 מיץ אשכולית סחוט',v:'250ml'}],
+   vitamins:['Zinc 50mg SOLGAR (1 טבלית) ⚠️ יום כן','MyVitamins Zinc+Vit C (1 טבלית) ⚠️ יום לא','Beet Root (2 קפסולות)','Panax Ginseng (1 קפסולה)','Rhodiola (1 קפסולה)','Horse Chestnut 300mg (1 קפסולה — NOW Foods)']},
+  {id:'pomegranate',time:'16:30',icon:'🍹',name:'מיץ רימונים',kcal:'~150 kcal',type:'drink',isLohamim:false,requiresPhoto:false,notify:'16:30 — מיץ רימונים סחוט! 🍹',
+   items:[{l:'מיץ רימונים סחוט',v:'250ml'}]},
+  {id:'meal3',time:'20:30',icon:'🥗',name:'ארוחה 3 — טונה + סלט',kcal:'~260 kcal',type:'food',isLohamim:true,requiresPhoto:true,notify:'ארוחה 3 — טונה + סלט! 🐟🥗',
+   items:[{l:'טונה במים',v:'160g (1 פחית)'},{l:'סלט ירקות',v:'3–4 סוגים'},{l:'קטשופ + מיונז',v:'כף כל אחד'}],
+   vitamins:['Omega-3 (1 קפסולה) — מנה 2','P-5-P Vitamin B6 50mg (1 קפסולה — NOW Foods)']},
+  {id:'meal4',time:'21:00',icon:'🍳',name:'ארוחה 4 — ביצים + קוטג׳',kcal:'~430 kcal',type:'food',isLohamim:true,requiresPhoto:true,notify:"ארוחה 4 — ביצים + קוטג' + פריכיות! 🍳",
+   items:[{l:'3 ביצים שלמות',v:'~210 kcal'},{l:"קוטג' 5%",v:'150g'},{l:'פריכיות',v:"5 יח'"},{l:'2 ירקות לבחירה',v:'200g'}]},
+  {id:'night',time:'21:30',icon:'🌙',name:'Night Recovery Stack',kcal:'~200 kcal',type:'drink',isLohamim:false,requiresPhoto:false,notify:'Night Recovery — Casein + שוקו פטריות! 🌙',
+   items:[{l:'ON Casein',v:'1 scoop (30g חלבון)'},{l:'Mushroom Hot Chocolate / Four Sigmatic',v:'16g (בחר אחד)'},{l:'Nesquik No Sugar Added',v:'1 כף'}],
+   vitamins:['Magnesium Bisglycinate 200mg (1 scoop — Natural Factors)','JoyMode (1 Packet) — אופציונלי']}
 ];
 
-const WEIGH_NOTIFY_HOUR = 6;
-const WEIGH_NOTIFY_MIN = 0;
-const WHATSAPP_RECIPIENT = '972509060929';
-const WHATSAPP_SENDER = '972542580471';
+// ===== STATE =====
+const WA = '972509060929';
+const WATER_GOAL = 17; // 17 cups x 180ml = ~3060ml
+let currentUser = null;
+let MENU = JSON.parse(localStorage.getItem('lh_menu')||'null') || DEFAULT_MENU;
+let state = JSON.parse(localStorage.getItem('lh_v5')||'{}');
+let menuHistory = JSON.parse(localStorage.getItem('lh_menu_history')||'[]');
+let profileData = JSON.parse(localStorage.getItem('lh_profile')||'{}');
+let profileEditMode = false;
+let todayKey = new Date().toISOString().split('T')[0];
+if(!state[todayKey]) state[todayKey]={items:{},photos:{},weigh:null,water:0,bodyPhotos:{}};
+let curPhotoId=null, curWeighSlot=null;
 
-// ===================== STATE =====================
-let state = JSON.parse(localStorage.getItem('lohamim_state') || '{}');
-let todayKey = getTodayKey();
-if (!state[todayKey]) state[todayKey] = { meals: {}, weigh: null, photos: {} };
-let currentMealPhotoId = null;
-let currentWeighPhotoType = null;
-let weighPhotos = { front: null, side: null };
+function save(){localStorage.setItem('lh_v5',JSON.stringify(state));}
+function saveMenu(){localStorage.setItem('lh_menu',JSON.stringify(MENU));}
+function saveMenuHistory(){localStorage.setItem('lh_menu_history',JSON.stringify(menuHistory));}
+function saveProfile(){localStorage.setItem('lh_profile',JSON.stringify(profileData));}
+function isAdmin(){return currentUser && CONFIG.users[currentUser]?.role==='admin';}
 
-// ===================== INIT =====================
-document.addEventListener('DOMContentLoaded', () => {
-  updateDateChip();
-  renderMeals();
-  updateProgress();
-  registerSW();
-  checkNotifyPermission();
-  scheduleAllNotifications();
-  renderHistory();
-});
-
-function getTodayKey() {
-  return new Date().toISOString().split('T')[0];
-}
-
-function saveState() {
-  localStorage.setItem('lohamim_state', JSON.stringify(state));
-}
-
-// ===================== DATE =====================
-function updateDateChip() {
-  const days = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
-  const months = ['ינו','פבר','מרץ','אפר','מאי','יונ','יול','אוג','ספט','אוק','נוב','דצ'];
-  const d = new Date();
-  document.getElementById('dateChip').textContent =
-    `יום ${days[d.getDay()]} • ${d.getDate()} ${months[d.getMonth()]}`;
-}
-
-// ===================== RENDER MEALS =====================
-function renderMeals() {
-  const container = document.getElementById('mealsContainer');
-  container.innerHTML = '';
-  const dayData = state[todayKey];
-
-  MEALS.forEach((meal, idx) => {
-    const done = !!dayData.meals[meal.id];
-    const photo = dayData.photos[meal.id];
-
-    const card = document.createElement('div');
-    card.className = `meal-card${done ? ' done' : ''}`;
-    card.id = `card_${meal.id}`;
-
-    const itemsHTML = meal.items.map(i =>
-      `<div class="meal-item"><span>${i.label}</span><strong>${i.val}</strong></div>`
-    ).join('');
-
-    const photoSection = meal.requiresPhoto ? `
-      <div class="photo-section">
-        <div class="photo-required-label">חובה תמונת ארוחה</div>
-        ${photo
-          ? `<img src="${photo}" class="photo-preview visible" id="preview_${meal.id}"/>`
-          : `<button class="photo-upload-btn" onclick="triggerMealPhoto('${meal.id}')">
-              <span>📷</span> צלם / העלה תמונה
-             </button>
-             <img src="" class="photo-preview" id="preview_${meal.id}"/>`
-        }
-      </div>` : '';
-
-    const canDone = !meal.requiresPhoto || !!photo;
-    const doneSection = done ? '' : `
-      ${photoSection}
-      <button class="done-btn" id="doneBtn_${meal.id}"
-        ${canDone ? '' : 'disabled'}
-        onclick="markDone('${meal.id}')">
-        ✅ סיימתי
-      </button>
-      ${meal.requiresPhoto && photo ? `
-        <button class="done-btn whatsapp" onclick="sendToWhatsApp('${meal.id}')">
-          📲 שלח לאפק בוואטסאפ
-        </button>` : ''}
-    `;
-
-    card.innerHTML = `
-      <div class="meal-header" onclick="toggleCard('${meal.id}')">
-        <div class="meal-icon ${done ? 'done-icon' : ''}">${done ? '✅' : meal.icon}</div>
-        <div class="meal-info">
-          <div class="meal-name">${meal.name}</div>
-          <div class="meal-time">⏰ ${meal.time}</div>
-          <div class="meal-kcal">${meal.kcal}</div>
-        </div>
-        <div class="meal-status ${done ? 'done' : ''}">${done ? '✓' : '○'}</div>
-      </div>
-      <div class="meal-body" id="body_${meal.id}">
-        <div class="meal-items">${itemsHTML}</div>
-        ${done
-          ? `<div style="text-align:center;color:var(--green);font-weight:700;font-size:14px;padding:8px 0">✅ בוצע!</div>
-             ${photo ? `<img src="${photo}" class="photo-preview visible"/>
-             <button class="done-btn whatsapp" style="margin-top:8px" onclick="sendToWhatsApp('${meal.id}')">📲 שלח לאפק בוואטסאפ</button>` : ''}`
-          : doneSection
-        }
-      </div>
-    `;
-    container.appendChild(card);
+// ===== LOGIN =====
+function doLogin(){
+  const user=document.getElementById('loginUser').value.trim();
+  const pass=document.getElementById('loginPass').value.trim();
+  const err=document.getElementById('loginErr');
+  if(!CONFIG.users[user]||CONFIG.users[user].password!==pass){err.classList.add('show');return;}
+  err.classList.remove('show');
+  currentUser=user;
+  localStorage.setItem('lh_session',user);
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('appWrap').style.display='block';
+  ['userChip','userChip2','userChip3','userChip4'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent=`${user} | יציאה`;
   });
+  initApp();
 }
-
-function toggleCard(id) {
-  const body = document.getElementById(`body_${id}`);
-  body.classList.toggle('open');
+function doLogout(){
+  localStorage.removeItem('lh_session');
+  currentUser=null;
+  document.getElementById('loginWrap').style.display='flex';
+  document.getElementById('appWrap').style.display='none';
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
 }
-
-// ===================== PROGRESS =====================
-function updateProgress() {
-  const dayData = state[todayKey];
-  const done = Object.keys(dayData.meals).length;
-  const total = MEALS.length;
-  document.getElementById('progressText').textContent = `${done} / ${total} ארוחות`;
-  document.getElementById('progressFill').style.width = `${(done/total)*100}%`;
-}
-
-// ===================== PHOTO =====================
-function triggerMealPhoto(mealId) {
-  currentMealPhotoId = mealId;
-  document.getElementById('mealPhotoInput').value = '';
-  document.getElementById('mealPhotoInput').click();
-}
-
-function handleMealPhoto(e) {
-  const file = e.target.files[0];
-  if (!file || !currentMealPhotoId) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    state[todayKey].photos[currentMealPhotoId] = ev.target.result;
-    saveState();
-    renderMeals();
-    // open card
-    setTimeout(() => {
-      const body = document.getElementById(`body_${currentMealPhotoId}`);
-      if (body) body.classList.add('open');
-    }, 50);
-    showToast('תמונה נשמרה! ✅', 'green');
-  };
-  reader.readAsDataURL(file);
-}
-
-// ===================== MARK DONE =====================
-function markDone(mealId) {
-  const meal = MEALS.find(m => m.id === mealId);
-  if (meal.requiresPhoto && !state[todayKey].photos[mealId]) {
-    showToast('חובה להעלות תמונה קודם 📸', 'gold');
-    return;
-  }
-  state[todayKey].meals[mealId] = { time: new Date().toISOString() };
-  saveState();
-  updateProgress();
-  renderMeals();
-  showToast(`${meal.name} — בוצע! 💪`, 'green');
-  // auto-open to show WhatsApp btn
-  setTimeout(() => {
-    const body = document.getElementById(`body_${mealId}`);
-    if (body) body.classList.add('open');
-  }, 100);
-}
-
-// ===================== WHATSAPP =====================
-function sendToWhatsApp(mealId) {
-  const photo = state[todayKey].photos[mealId];
-  const msg = encodeURIComponent('בוצע');
-  const url = `https://wa.me/${WHATSAPP_RECIPIENT}?text=${msg}`;
-  window.open(url, '_blank');
-  if (photo) {
-    showToast('וואטסאפ נפתח — שתף את התמונה ידנית', 'gold');
-  }
-}
-
-// ===================== WEIGH =====================
-let activeWeighSlot = null;
-function triggerWeighPhoto(type) {
-  activeWeighSlot = type;
-  document.getElementById('weighPhotoInput').value = '';
-  document.getElementById('weighPhotoInput').click();
-}
-
-function handleWeighPhoto(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    weighPhotos[activeWeighSlot] = ev.target.result;
-    const slot = document.getElementById(activeWeighSlot === 'front' ? 'frontSlot' : 'sideSlot');
-    slot.classList.add('has-photo');
-    slot.innerHTML = `<img src="${ev.target.result}"/><span style="position:relative;z-index:1;color:#fff;font-size:10px;background:rgba(0,0,0,0.5);padding:2px 6px;border-radius:4px">${activeWeighSlot === 'front' ? 'פרונטלי ✓' : 'צד ✓'}</span>`;
-    showToast('תמונה נשמרה ✅', 'green');
-  };
-  reader.readAsDataURL(file);
-}
-
-function sendWeighToWhatsApp() {
-  const weight = document.getElementById('weightInput').value;
-  if (!weight) { showToast('נא להכניס משקל 🔢', 'gold'); return; }
-  const today = new Date();
-  const dateStr = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
-  const msg = encodeURIComponent(`📅 ${dateStr}\n⚖️ משקל: ${weight} ק"ג\nבוצע`);
-  const url = `https://wa.me/${WHATSAPP_RECIPIENT}?text=${msg}`;
-  window.open(url, '_blank');
-  // save
-  state[todayKey].weigh = { weight, date: today.toISOString() };
-  saveState();
-  renderHistory();
-  showToast('נתוני שקילה נשלחו! ⚖️', 'green');
-}
-
-// ===================== SERVICE WORKER =====================
-function registerSW() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
-  }
-}
-
-// ===================== NOTIFICATIONS =====================
-function checkNotifyPermission() {
-  if (!('Notification' in window)) return;
-  if (Notification.permission === 'default') {
-    document.getElementById('notifyBanner').style.display = 'flex';
-  }
-}
-
-function requestNotifications() {
-  Notification.requestPermission().then(p => {
-    document.getElementById('notifyBanner').style.display = 'none';
-    if (p === 'granted') {
-      showToast('התראות הופעלו! 🔔', 'green');
-      scheduleAllNotifications();
-    }
-  });
-}
-
-function scheduleAllNotifications() {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  const now = new Date();
-
-  // Schedule meal notifications
-  MEALS.forEach(meal => {
-    const [h, m] = meal.time.split(':').map(Number);
-    const target = new Date();
-    target.setHours(h, m, 0, 0);
-    if (target > now) {
-      const delay = target - now;
-      setTimeout(() => {
-        if (!state[getTodayKey()]?.meals[meal.id]) {
-          new Notification('פרויקט לוחמים 🏆', {
-            body: meal.notifyText,
-            icon: '⚔️',
-            badge: '⚔️',
-            tag: meal.id
-          });
-        }
-      }, delay);
-    }
-  });
-
-  // Schedule weigh notification at 06:00
-  const weighTarget = new Date();
-  weighTarget.setHours(WEIGH_NOTIFY_HOUR, WEIGH_NOTIFY_MIN, 0, 0);
-  if (weighTarget <= now) weighTarget.setDate(weighTarget.getDate() + 1);
-  const weighDelay = weighTarget - now;
-  setTimeout(() => {
-    new Notification('פרויקט לוחמים ⚖️', {
-      body: '06:00 — זמן לשקילה + 2 תמונות גוף! 📸',
-      tag: 'weigh'
+function checkSession(){
+  const saved=localStorage.getItem('lh_session');
+  if(saved&&CONFIG.users[saved]){
+    currentUser=saved;
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('appWrap').style.display='block';
+    ['userChip','userChip2','userChip3','userChip4'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.textContent=`${saved} | יציאה`;
     });
-    // reschedule for next day
-    setTimeout(() => scheduleAllNotifications(), 60000);
-  }, weighDelay);
-}
-
-// ===================== VIEWS =====================
-function switchView(view) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (view === 'today') {
-    document.getElementById('viewToday').classList.add('active');
-    document.getElementById('navToday').classList.add('active');
-  } else {
-    document.getElementById('viewHistory').classList.add('active');
-    document.getElementById('navHistory').classList.add('active');
-    renderHistory();
+    initApp();
   }
 }
 
-// ===================== HISTORY =====================
-function renderHistory() {
-  const container = document.getElementById('historyContainer');
-  const keys = Object.keys(state).sort().reverse();
-  if (!keys.length) {
-    container.innerHTML = '<div class="history-empty">אין היסטוריה עדיין 📋</div>';
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  checkSession();
+});
+function initApp(){
+  updateDate(); renderAll(); updateProgress();
+  registerSW(); checkNotify(); scheduleAll();
+}
+function updateDate(){
+  const days=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+  const months=['ינו','פבר','מרץ','אפר','מאי','יונ','יול','אוג','ספט','אוק','נוב','דצ'];
+  const d=new Date();
+  document.getElementById('dateChip').textContent=`יום ${days[d.getDay()]} • ${d.getDate()} ${months[d.getMonth()]}`;
+}
+
+// ===== WATER =====
+function renderWater(){
+  const cups = state[todayKey].water || 0;
+  const pct = Math.min((cups/WATER_GOAL)*100,100);
+  const ml = cups * 180;
+  let cupsHTML = '';
+  for(let i=0;i<WATER_GOAL;i++){
+    cupsHTML += `<span class="water-cup ${i<cups?'filled':''}" onclick="addWater()">🥤</span>`;
+  }
+  return `<div class="water-card">
+    <div class="water-top">
+      <div class="water-title">💧 צריכת מים יומית</div>
+      <div class="water-count">${cups}/${WATER_GOAL} כוסות (${ml}ml / 3000ml)</div>
+    </div>
+    <div class="water-track"><div class="water-fill" style="width:${pct}%"></div></div>
+    <div class="water-cups">${cupsHTML}</div>
+    <div class="water-btns">
+      <button class="water-btn" onclick="addWater()">+ כוס</button>
+      <button class="water-btn remove" onclick="removeWater()">− כוס</button>
+    </div>
+  </div>`;
+}
+function addWater(){
+  if(!state[todayKey]) state[todayKey]={items:{},photos:{},weigh:null,water:0,bodyPhotos:{}};
+  if(state[todayKey].water >= WATER_GOAL){showToast('יעד המים הושג! 💧✅','blue');return;}
+  state[todayKey].water = (state[todayKey].water||0)+1;
+  save();
+  const container=document.getElementById('mainContainer');
+  const wc=container.querySelector('.water-card');
+  if(wc){const tmp=document.createElement('div');tmp.innerHTML=renderWater();wc.replaceWith(tmp.firstChild);}
+  if(state[todayKey].water===WATER_GOAL) showToast('🎉 יעד המים הושג! 3 ליטר!','blue');
+}
+function removeWater(){
+  if(!state[todayKey].water||state[todayKey].water<=0) return;
+  state[todayKey].water--;
+  save();
+  const container=document.getElementById('mainContainer');
+  const wc=container.querySelector('.water-card');
+  if(wc){const tmp=document.createElement('div');tmp.innerHTML=renderWater();wc.replaceWith(tmp.firstChild);}
+}
+
+// ===== RENDER ALL =====
+function renderAll(){
+  const c=document.getElementById('mainContainer');
+  c.innerHTML='';
+
+  if(!isAdmin()){
+    // LAVI VIEW
+    document.getElementById('progressWrap').style.display='none';
+    c.innerHTML=`<div class="section-label">🍽️ ארוחות היום</div>`;
+    MENU.filter(m=>m.isLohamim).forEach(meal=>{
+      const done=!!state[todayKey].items[meal.id];
+      const div=document.createElement('div');
+      div.innerHTML=`<div class="lavi-meal-row">
+        <div><div class="lavi-meal-name">${meal.name}</div><div class="lavi-meal-time">⏰ ${meal.time}</div></div>
+        <div class="lavi-check ${done?'done':'notdone'}">${done?'✓':'○'}</div>
+      </div>`;
+      c.appendChild(div);
+    });
+    renderUploadSection(c);
     return;
   }
-  container.innerHTML = keys.map(key => {
-    const day = state[key];
-    const doneMeals = Object.keys(day.meals || {}).length;
-    const weigh = day.weigh;
-    const photos = Object.values(day.photos || {});
-    const [y, m, d] = key.split('-');
-    const dateLabel = `${d}/${m}/${y}`;
-    return `
-      <div class="history-entry">
-        <div class="history-date">📅 ${dateLabel}</div>
-        <div class="history-row"><span>ארוחות שבוצעו</span><span>${doneMeals} / ${MEALS.length}</span></div>
-        ${weigh ? `<div class="history-row"><span>משקל</span><span>${weigh.weight} ק"ג</span></div>` : ''}
-        ${photos.length ? `<div class="history-photos">${photos.slice(0,4).map(p => `<img src="${p}"/>`).join('')}</div>` : ''}
-      </div>`;
+
+  // AFEK VIEW
+  document.getElementById('progressWrap').style.display='block';
+
+  // Water
+  c.innerHTML+=`<div class="section-label">💧 מים</div>`;
+  const waterDiv=document.createElement('div');
+  waterDiv.innerHTML=renderWater();
+  c.appendChild(waterDiv);
+
+  // Weigh
+  c.innerHTML+=`<div class="section-label">⚖️ שקילה יומית</div>
+  <div class="weigh-card">
+    <div class="weigh-title">שקילה + תמונות גוף</div>
+    <div class="weigh-sub">כל יום 06:00 — בלי חולצה</div>
+    <div class="weigh-row">
+      <input class="weigh-input" type="number" id="weightInput" placeholder="75.5" step="0.1" min="40" max="200"/>
+      <div class="weigh-unit">ק"ג</div>
+    </div>
+    <div class="photo-row">
+      <div class="photo-slot" id="frontSlot" onclick="triggerWP('front')"><span style="font-size:20px">📸</span><span>פרונטלי</span></div>
+      <div class="photo-slot" id="sideSlot" onclick="triggerWP('side')"><span style="font-size:20px">📸</span><span>צד</span></div>
+    </div>
+    <button class="abtn primary" onclick="sendWeighWA()">שלח ללביא ⚡</button>
+  </div>
+  <div class="section-label">🍽️ תפריט יומי מלא</div>`;
+
+  MENU.forEach(meal=>{
+    const done=!!state[todayKey].items[meal.id];
+    const photo=state[todayKey].photos[meal.id];
+    const badge=meal.isLohamim?`<span class="badge badge-l">לוחמים</span>`:
+      meal.type==='drink'?`<span class="badge badge-d">שתייה</span>`:
+      meal.type==='vitamins'?`<span class="badge badge-v">ויטמינים</span>`:'';
+    const itemsH=(meal.items||[]).map(i=>`<div class="ir"><span>${i.l}</span><span class="v">${i.v}</span></div>`).join('');
+    const vitsH=(meal.vitamins&&meal.vitamins.length)?`
+      <div class="vit-sec">
+        <div class="vit-lbl">💊 תוספים וויטמינים</div>
+        ${meal.vitamins.map(v=>`<div class="vit-item">${v}</div>`).join('')}
+        ${meal.vitNote?`<div class="vit-note">${meal.vitNote}</div>`:''}
+      </div>`:'';
+    const photoH=meal.requiresPhoto?`
+      <div class="photo-sec">
+        <div class="photo-lbl">חובה תמונת ארוחה</div>
+        ${photo?`<img src="${photo}" class="photo-prev show"/>`:
+          `<button class="upload-btn" onclick="triggerMP('${meal.id}')">📷 צלם / העלה תמונה</button>
+           <img src="" class="photo-prev" id="prev_${meal.id}"/>`}
+      </div>`:'';
+    const canDone=!meal.requiresPhoto||!!photo;
+    const bodyH=done
+      ?`<div class="done-banner">✅ בוצע!</div>
+        ${photo?`<img src="${photo}" class="photo-prev show" style="margin-top:8px"/>
+        <button class="abtn wa" onclick="sendMealWA('${meal.id}')">📲 שלח ללביא בוואטסאפ</button>`:''}`
+      :`${itemsH}${vitsH}${photoH}
+       <button class="abtn ${meal.requiresPhoto?'primary':'simple'}" ${canDone?'':'disabled'} onclick="markDone('${meal.id}')">✅ סיימתי</button>
+       ${meal.isLohamim&&photo?`<button class="abtn wa" onclick="sendMealWA('${meal.id}')">📲 שלח ללביא בוואטסאפ</button>`:''}`;
+    const div=document.createElement('div');
+    div.innerHTML=`<div class="card${done?' done':''}${meal.isLohamim?' lohamim-card':''}" id="card_${meal.id}">
+      <div class="card-header" onclick="toggleCard('${meal.id}')">
+        <div class="card-icon">${done?'✅':meal.icon}</div>
+        <div class="card-info">
+          <div class="card-name">${meal.name}</div>
+          <div class="card-meta"><span class="card-time">⏰ ${meal.time}</span>${meal.kcal!=='—'?`<span class="card-kcal">${meal.kcal}</span>`:''}${badge}</div>
+        </div>
+        <div class="card-check${done?' done':''}">${done?'✓':'○'}</div>
+      </div>
+      <div class="card-body" id="body_${meal.id}">${bodyH}</div>
+    </div>`;
+    c.appendChild(div);
+  });
+  renderUploadSection(c);
+}
+
+function renderUploadSection(c){
+  const div=document.createElement('div');
+  div.innerHTML=`<div class="section-label">📋 תפריט חדש</div>
+  <div class="upload-menu-card">
+    <div class="upload-menu-title">העלאת תפריט חדש</div>
+    <div class="upload-menu-sub">AI יפרוט את הארוחות ויחליף את התפריט הנוכחי</div>
+    <div class="file-drop" onclick="document.getElementById('menuFileInput').click()">
+      <div class="drop-icon">📁</div>
+      <div class="drop-text">לחץ להעלאת תפריט</div>
+      <div class="drop-sub">תמונה (JPG/PNG) או PDF</div>
+    </div>
+    <div class="ai-status" id="aiStatus">⏳ הסוכן מנתח את התפריט...</div>
+  </div>`;
+  c.appendChild(div);
+}
+
+function toggleCard(id){document.getElementById(`body_${id}`).classList.toggle('open');}
+
+function updateProgress(){
+  if(!isAdmin()) return;
+  const done=Object.keys(state[todayKey].items).length;
+  const total=MENU.length;
+  document.getElementById('progressText').textContent=`${done} / ${total} פריטים`;
+  document.getElementById('progressFill').style.width=`${(done/total)*100}%`;
+}
+
+// ===== PHOTOS =====
+function triggerMP(id){curPhotoId=id;document.getElementById('mealPhotoInput').value='';document.getElementById('mealPhotoInput').click();}
+function handleMealPhoto(e){
+  const f=e.target.files[0];if(!f||!curPhotoId)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    state[todayKey].photos[curPhotoId]=ev.target.result;save();
+    renderAll();updateProgress();
+    setTimeout(()=>{const b=document.getElementById(`body_${curPhotoId}`);if(b)b.classList.add('open');},60);
+    showToast('תמונה נשמרה ✅','green');
+  };r.readAsDataURL(f);
+}
+function markDone(id){
+  const meal=MENU.find(m=>m.id===id);
+  if(meal.requiresPhoto&&!state[todayKey].photos[id]){showToast('חובה להעלות תמונה קודם 📸','gold');return;}
+  state[todayKey].items[id]={time:new Date().toISOString()};save();updateProgress();renderAll();
+  showToast(`${meal.name} — בוצע! 💪`,'green');
+  setTimeout(()=>{const b=document.getElementById(`body_${id}`);if(b)b.classList.add('open');},80);
+}
+function sendMealWA(id){
+  window.open(`https://wa.me/${WA}?text=${encodeURIComponent('בוצע')}`, '_blank');
+  showToast('וואטסאפ נפתח — שתף את התמונה 📲','gold');
+}
+function triggerWP(slot){curWeighSlot=slot;document.getElementById('weighPhotoInput').value='';document.getElementById('weighPhotoInput').click();}
+function handleWeighPhoto(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    if(!state[todayKey].bodyPhotos) state[todayKey].bodyPhotos={};
+    state[todayKey].bodyPhotos[curWeighSlot]=ev.target.result;save();
+    const el=document.getElementById(curWeighSlot==='front'?'frontSlot':'sideSlot');
+    if(el){el.classList.add('has-photo');el.innerHTML=`<img src="${ev.target.result}"/><span style="position:relative;z-index:1;background:rgba(0,0,0,0.5);padding:2px 6px;border-radius:4px;font-size:10px;color:#fff">${curWeighSlot==='front'?'פרונטלי ✓':'צד ✓'}</span>`;}
+    showToast('תמונה נשמרה ✅','green');
+  };r.readAsDataURL(f);
+}
+function sendWeighWA(){
+  const w=document.getElementById('weightInput').value;
+  if(!w){showToast('נא להכניס משקל 🔢','gold');return;}
+  const d=new Date();
+  window.open(`https://wa.me/${WA}?text=${encodeURIComponent(`📅 ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}\n⚖️ משקל: ${w} ק"ג\nבוצע`)}`, '_blank');
+  state[todayKey].weigh={weight:w,date:d.toISOString()};save();renderHistory();
+  showToast('נשלח ללביא! ⚖️','green');
+}
+
+// ===== MENU UPLOAD =====
+async function handleMenuUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  const statusEl=document.getElementById('aiStatus');
+  statusEl.textContent='⏳ הסוכן מנתח את התפריט...';statusEl.classList.add('show');
+  try{
+    const base64=await fileToBase64(file);
+    const isPdf=file.type==='application/pdf';
+    const mediaType=isPdf?'application/pdf':(file.type||'image/jpeg');
+    const contentBlock=isPdf
+      ?{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}}
+      :{type:'image',source:{type:'base64',media_type:mediaType,data:base64}};
+    statusEl.textContent='🤖 הסוכן בונה את התפריט החדש...';
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,
+        messages:[{role:'user',content:[contentBlock,{type:'text',text:'קרא את התפריט והוצא ממנו את הארוחות העיקריות בלבד (3 עד 6 ארוחות, ללא תוספים, ללא ויטמינים). החזר JSON בלבד:\n[{"id":"meal1","time":"09:30","icon":"🥛","name":"שם הארוחה","kcal":"~400 kcal","type":"food","isLohamim":true,"requiresPhoto":true,"notify":"טקסט קצר","items":[{"l":"מרכיב","v":"כמות"}]}]\nחוקים: type=food/drink, isLohamim=true לארוחות ראשיות, requiresPhoto=true כשisLohamim=true, id ייחודי meal1/meal2/וכו׳'}]}]})
+    });
+    const data=await resp.json();
+    const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const newMeals=JSON.parse(text.replace(/```json|```/g,'').trim());
+    if(!Array.isArray(newMeals)||!newMeals.length)throw new Error('לא נמצאו ארוחות');
+    const now=new Date();
+    const totalKcal=MENU.filter(m=>m.kcal&&m.kcal!=='—').map(m=>parseInt(m.kcal.replace(/[^0-9]/g,''))||0).reduce((a,b)=>a+b,0);
+    menuHistory.unshift({date:now.toISOString(),label:`תפריט ${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`,meals:MENU.filter(m=>m.isLohamim).map(m=>({name:m.name,time:m.time,kcal:m.kcal})),totalKcal});
+    saveMenuHistory();MENU=newMeals;saveMenu();
+    statusEl.textContent=`✅ תפריט חדש נטען! ${newMeals.length} ארוחות`;
+    renderAll();updateProgress();scheduleAll();
+    if('Notification'in window&&Notification.permission==='granted') new Notification('פרויקט לוחמים 📋',{body:`תפריט חדש עלה! ${newMeals.length} ארוחות`,tag:'new_menu'});
+    showToast(`תפריט חדש! ${newMeals.length} ארוחות 🎉`,'green');
+  }catch(err){statusEl.textContent=`❌ שגיאה: ${err.message}`;showToast('שגיאה בניתוח ❌','gold');}
+}
+function fileToBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=()=>rej(new Error('שגיאה'));r.readAsDataURL(file);});}
+
+// ===== GALLERY =====
+function renderGallery(){
+  const c=document.getElementById('galleryContainer');
+  const folders={};
+  Object.keys(state).sort().reverse().forEach(dk=>{
+    const day=state[dk];
+    const [y,mo,d]=dk.split('-');
+    const lbl=`${d}/${mo}/${y}`;
+    Object.keys(day.photos||{}).forEach(mId=>{
+      const meal=MENU.find(m=>m.id===mId);
+      const name=meal?meal.name:mId;
+      if(!folders[dk]) folders[dk]={label:lbl,items:[]};
+      folders[dk].items.push({label:name,photo:day.photos[mId],mealId:mId,type:'meal'});
+    });
+    Object.keys(day.bodyPhotos||{}).forEach(slot=>{
+      if(!folders[dk]) folders[dk]={label:lbl,items:[]};
+      folders[dk].items.push({label:slot==='front'?'גוף — פרונטלי':'גוף — צד',photo:day.bodyPhotos[slot],type:'body',slot});
+    });
+  });
+  const keys=Object.keys(folders);
+  if(!keys.length){c.innerHTML='<div class="gallery-empty">אין תמונות עדיין 📸</div>';return;}
+  c.innerHTML=keys.map((dk,fi)=>{
+    const folder=folders[dk];
+    const del=isAdmin();
+    const items=folder.items.map((item,ii)=>`
+      <div class="gallery-item">
+        <img src="${item.photo}" onclick="openPhoto('${dk}',${ii})"/>
+        <div class="gallery-item-label">${item.label}</div>
+        ${del?`<button class="gallery-item-del" onclick="deletePhoto(event,'${dk}','${item.mealId||''}','${item.type}','${item.slot||''}')">✕</button>`:''}
+      </div>`).join('');
+    return`<div class="gallery-folder">
+      <div class="gallery-folder-header" onclick="document.getElementById('gf_${fi}').classList.toggle('open')">
+        <div><div class="gallery-folder-title">📁 ${folder.label}</div><div class="gallery-folder-sub">${folder.items.length} תמונות</div></div>
+        <span style="color:var(--text-faint)">▼</span>
+      </div>
+      <div class="gallery-grid" id="gf_${fi}">${items}</div>
+    </div>`;
   }).join('');
 }
+function deletePhoto(e,dk,mId,type,slot){
+  e.stopPropagation();if(!isAdmin())return;
+  if(type==='meal'&&mId) delete state[dk].photos[mId];
+  else if(type==='body'&&slot&&state[dk].bodyPhotos) delete state[dk].bodyPhotos[slot];
+  save();renderGallery();showToast('תמונה נמחקה 🗑️','gold');
+}
+function openPhoto(dk,idx){
+  const day=state[dk];const items=[];
+  Object.values(day.photos||{}).forEach(p=>items.push(p));
+  Object.values(day.bodyPhotos||{}).forEach(p=>items.push(p));
+  if(!items[idx])return;
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML=`<img src="${items[idx]}" style="max-width:95vw;max-height:90vh;border-radius:12px;object-fit:contain;"/>`;
+  overlay.onclick=()=>document.body.removeChild(overlay);
+  document.body.appendChild(overlay);
+}
 
-// ===================== TOAST =====================
-function showToast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove('show'), 3000);
+// ===== PROFILE =====
+function renderProfile(){
+  const c=document.getElementById('profileContainer');
+  const p=profileData;
+  const editing=profileEditMode;
+  const age=p.birthdate?computeAge(p.birthdate)+' שנים':'—';
+  const photoHTML=`<div class="profile-photo-wrap">
+    <div class="profile-photo" onclick="${editing?'triggerProfilePhoto()':''}">
+      ${p.photo?`<img src="${p.photo}"/>`:'👤'}
+      ${editing?`<div style="position:absolute;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:22px">📷</div>`:''}
+    </div>
+    ${editing?`<div class="profile-photo-edit" onclick="triggerProfilePhoto()">שנה תמונה</div>`:''}
+    <div class="profile-name-display">${p.firstName||''} ${p.lastName||''}</div>
+  </div>`;
+  const field=(label,key,type='text',suffix='')=>{
+    if(editing) return`<div class="profile-field"><div class="profile-label">${label}</div><input class="profile-input" type="${type}" value="${p[key]||''}" placeholder="${label}" oninput="profileData['${key}']=this.value${key==='birthdate'?';renderProfile()':''}"/></div>`;
+    let val=p[key]||'—';
+    if(suffix&&p[key]) val=p[key]+suffix;
+    return`<div class="profile-field"><div class="profile-label">${label}</div><div class="profile-value">${val}</div></div>`;
+  };
+  const goalsField=editing
+    ?`<div class="profile-field"><div class="profile-label">מטרות ויעדים</div><textarea class="profile-textarea" oninput="profileData.goals=this.value">${p.goals||''}</textarea></div>`
+    :`<div class="profile-field"><div class="profile-label">מטרות ויעדים</div><div class="profile-value" style="white-space:pre-wrap;font-size:13px">${p.goals||'—'}</div></div>`;
+  const btn=editing
+    ?`<button class="profile-save-btn" onclick="saveProfileData()">💾 שמור</button>`
+    :`<button class="profile-edit-btn" onclick="profileEditMode=true;renderProfile()">✏️ עריכה</button>`;
+  const weightHistory=[];
+  Object.keys(state).sort().forEach(dk=>{if(state[dk].weigh) weightHistory.push({date:dk,w:parseFloat(state[dk].weigh.weight)});});
+  c.innerHTML=`${photoHTML}
+    <div class="profile-card">
+      <div class="profile-card-title">פרטים אישיים</div>
+      ${field('שם פרטי','firstName')}${field('שם משפחה','lastName')}
+      ${field('תאריך לידה','birthdate','date')}
+      <div class="profile-field"><div class="profile-label">גיל</div><div class="profile-value">${age}</div></div>
+    </div>
+    <div class="profile-card">
+      <div class="profile-card-title">נתוני גוף</div>
+      ${field('משקל נוכחי','currentWeight','number',' ק"ג')}
+      ${field('משקל יעד','targetWeight','number',' ק"ג')}
+      ${field('אחוז שומן נוכחי','bodyFat','number','%')}
+    </div>
+    <div class="profile-card">
+      <div class="profile-card-title">מטרות ויעדים</div>${goalsField}
+    </div>
+    ${btn}
+    <div class="profile-chart-wrap">
+      <div class="profile-chart-title">📈 גרף התקדמות משקל</div>
+      <canvas id="weightChart" style="width:100%;height:200px"></canvas>
+    </div>`;
+  setTimeout(()=>drawWeightChart(weightHistory),80);
+}
+function computeAge(ds){
+  if(!ds)return'—';const d=new Date(ds),n=new Date();
+  let a=n.getFullYear()-d.getFullYear();
+  if(n.getMonth()-d.getMonth()<0||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate()))a--;
+  return a;
+}
+function saveProfileData(){saveProfile();profileEditMode=false;if(profileData.currentWeight){if(!state[todayKey].weigh)state[todayKey].weigh={};state[todayKey].weigh.weight=profileData.currentWeight;save();}renderProfile();showToast('פרופיל נשמר ✅','green');}
+function triggerProfilePhoto(){document.getElementById('profilePhotoInput').click();}
+function handleProfilePhoto(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{profileData.photo=ev.target.result;saveProfile();renderProfile();showToast('תמונת פרופיל עודכנה ✅','green');};r.readAsDataURL(f);}
+function drawWeightChart(history){
+  const canvas=document.getElementById('weightChart');if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||300;const H=200;
+  canvas.width=W;canvas.height=H;
+  const pad={top:20,right:50,bottom:40,left:45};
+  const cW=W-pad.left-pad.right,cH=H-pad.top-pad.bottom;
+  const curW=parseFloat(profileData.currentWeight)||null;
+  const tarW=parseFloat(profileData.targetWeight)||null;
+  let pts=[...history];
+  if(curW&&!pts.find(p=>p.date===todayKey)) pts.push({date:todayKey,w:curW});
+  pts.sort((a,b)=>a.date.localeCompare(b.date));
+  ctx.clearRect(0,0,W,H);
+  if(!pts.length){ctx.fillStyle='rgba(240,234,214,0.3)';ctx.font='13px Heebo';ctx.textAlign='center';ctx.fillText('אין נתוני משקל עדיין',W/2,H/2);return;}
+  const allW=pts.map(p=>p.w);if(tarW)allW.push(tarW);
+  const minW=Math.min(...allW)-2,maxW=Math.max(...allW)+2;
+  const xS=pts.length>1?cW/(pts.length-1):cW;
+  const yS=cH/(maxW-minW);
+  const tx=i=>pad.left+i*xS,ty=w=>pad.top+(maxW-w)*yS;
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=pad.top+(cH/4)*i;ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cW,y);ctx.stroke();ctx.fillStyle='rgba(240,234,214,0.4)';ctx.font='10px Heebo';ctx.textAlign='right';ctx.fillText((maxW-(maxW-minW)*i/4).toFixed(1),pad.left-4,y+4);}
+  // target line
+  if(tarW){const ty2=ty(tarW);ctx.strokeStyle='rgba(46,204,113,0.5)';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(pad.left,ty2);ctx.lineTo(pad.left+cW,ty2);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#2ecc71';ctx.font='10px Heebo';ctx.textAlign='left';ctx.fillText('יעד: '+tarW,pad.left+4,ty2-4);}
+  // line+fill
+  if(pts.length>1){ctx.strokeStyle='rgba(201,168,76,0.8)';ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.beginPath();pts.forEach((p,i)=>{i===0?ctx.moveTo(tx(i),ty(p.w)):ctx.lineTo(tx(i),ty(p.w));});ctx.stroke();ctx.beginPath();pts.forEach((p,i)=>{i===0?ctx.moveTo(tx(i),ty(p.w)):ctx.lineTo(tx(i),ty(p.w));});ctx.lineTo(tx(pts.length-1),pad.top+cH);ctx.lineTo(tx(0),pad.top+cH);ctx.closePath();ctx.fillStyle='rgba(201,168,76,0.08)';ctx.fill();}
+  // dots
+  pts.forEach((p,i)=>{const x=tx(i),y=ty(p.w),cur=p.date===todayKey;ctx.beginPath();ctx.arc(x,y,cur?7:4,0,Math.PI*2);ctx.fillStyle=cur?'#e74c3c':'#c9a84c';ctx.fill();if(cur){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();}ctx.fillStyle='rgba(240,234,214,0.45)';ctx.font='9px Heebo';ctx.textAlign='center';const d=new Date(p.date);ctx.fillText(`${d.getDate()}/${d.getMonth()+1}`,x,H-8);});
+  // target dot
+  if(tarW){const x=pad.left+cW,y=ty(tarW);ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fillStyle='#2ecc71';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();}
+}
+
+// ===== HISTORY =====
+function renderHistory(){
+  const c=document.getElementById('historyContainer');let html='';
+  if(menuHistory.length){
+    html+=`<div class="section-label">📋 תפריטים קודמים</div>`;
+    menuHistory.forEach((entry,idx)=>{
+      html+=`<div class="menu-archive-entry" onclick="document.getElementById('arch_${idx}').classList.toggle('open')">
+        <div class="menu-archive-title">📋 ${entry.label}</div>
+        <div class="menu-archive-sub">${entry.meals.length} ארוחות • ~${entry.totalKcal} kcal</div>
+        <div class="menu-archive-meals" id="arch_${idx}">${entry.meals.map(m=>`<div class="archive-meal-row">⏰ ${m.time} — ${m.name} (${m.kcal})</div>`).join('')}</div>
+      </div>`;
+    });
+  }
+  const keys=Object.keys(state).sort().reverse();
+  if(keys.length){
+    html+=`<div class="section-label">📅 היסטוריה יומית</div>`;
+    keys.forEach(k=>{
+      const day=state[k];const done=Object.keys(day.items||{}).length;
+      const photos=Object.values(day.photos||{});const [y,mo,d]=k.split('-');
+      const names=Object.keys(day.items||{}).map(id=>{const m=MENU.find(x=>x.id===id);return m?m.name:id;});
+      html+=`<div class="history-entry">
+        <div class="history-header" onclick="this.nextElementSibling.classList.toggle('open')">
+          <div><div class="history-date">📅 ${d}/${mo}/${y}</div>
+          <div class="history-meta">${done}/${MENU.length} פריטים${day.weigh?` • ${day.weigh.weight} ק"ג`:''}${day.water?` • ${day.water} כוסות מים`:''}</div></div>
+          <span style="color:var(--text-faint)">▼</span>
+        </div>
+        <div class="history-body">
+          ${names.map(n=>`<div class="history-meal-row"><span>${n}</span><span style="color:var(--green)">✅</span></div>`).join('')}
+          ${photos.length?`<div class="history-photos">${photos.slice(0,6).map(p=>`<img src="${p}"/>`).join('')}</div>`:''}
+        </div>
+      </div>`;
+    });
+  }
+  if(!html)html='<div class="history-empty">אין היסטוריה עדיין 📋</div>';
+  c.innerHTML=html;
+}
+
+// ===== SW & NOTIFICATIONS =====
+function registerSW(){if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+function checkNotify(){if(!('Notification'in window))return;if(Notification.permission==='default')document.getElementById('notifyBanner').style.display='flex';}
+function requestNotifications(){Notification.requestPermission().then(p=>{document.getElementById('notifyBanner').style.display='none';if(p==='granted'){showToast('התראות הופעלו! 🔔','green');scheduleAll();}});}
+function scheduleAll(){
+  if(!('Notification'in window)||Notification.permission!=='granted')return;
+  const now=new Date();
+  MENU.forEach(meal=>{
+    const [h,m]=meal.time.split(':').map(Number);
+    const pre=new Date();pre.setHours(h,m,0,0);pre.setMinutes(pre.getMinutes()-15);
+    if(pre<=now)pre.setDate(pre.getDate()+1);
+    setTimeout(()=>new Notification('פרויקט לוחמים ⏰',{body:`בעוד 15 דקות — ${meal.name}`,tag:`pre_${meal.id}`}),pre-now);
+    const on=new Date();on.setHours(h,m,0,0);if(on<=now)on.setDate(on.getDate()+1);
+    setTimeout(()=>{const tk=new Date().toISOString().split('T')[0];if(!state[tk]?.items[meal.id])new Notification('פרויקט לוחמים 🏆',{body:meal.notify,tag:meal.id});},on-now);
+  });
+  // Weigh
+  const wt=new Date();wt.setHours(6,0,0,0);if(wt<=now)wt.setDate(wt.getDate()+1);
+  const wp=new Date(wt-15*60000);
+  if(wp>now)setTimeout(()=>new Notification('פרויקט לוחמים ⚖️',{body:'בעוד 15 דקות — שקילה! 📸',tag:'pre_weigh'}),wp-now);
+  setTimeout(()=>{new Notification('פרויקט לוחמים ⚖️',{body:'06:00 — שקילה + תמונות גוף! 📸',tag:'weigh'});setTimeout(()=>scheduleAll(),61000);},wt-now);
+  // Water every hour
+  scheduleWaterReminders();
+}
+function scheduleWaterReminders(){
+  const now=new Date();
+  for(let h=7;h<=22;h++){
+    const t=new Date();t.setHours(h,0,0,0);
+    if(t<=now)t.setDate(t.getDate()+1);
+    setTimeout(()=>{
+      const tk=new Date().toISOString().split('T')[0];
+      const cups=state[tk]?.water||0;
+      if(cups<WATER_GOAL) new Notification('פרויקט לוחמים 💧',{body:'זמן לשתות 2 כוסות מים! 💧💧',tag:`water_${h}`});
+    },t-now);
+  }
+}
+
+// ===== VIEWS =====
+function switchView(v){
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  const map={today:['viewToday','navToday'],history:['viewHistory','navHistory'],gallery:['viewGallery','navGallery'],profile:['viewProfile','navProfile']};
+  if(map[v]){document.getElementById(map[v][0]).classList.add('active');document.getElementById(map[v][1]).classList.add('active');}
+  if(v==='history')renderHistory();
+  if(v==='gallery')renderGallery();
+  if(v==='profile')renderProfile();
+}
+
+// ===== TOAST =====
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3500);
 }
 </script>
 </body>
