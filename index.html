@@ -159,6 +159,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .gallery-item img{width:100%;height:100%;object-fit:cover;display:block;}
 .gallery-item-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.65);font-size:9px;color:#fff;padding:3px 5px;text-align:center;line-height:1.3;}
 .gallery-item-del{position:absolute;top:4px;right:4px;background:rgba(231,76,60,0.85);border:none;border-radius:50%;width:22px;height:22px;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.gallery-item-dl{position:absolute;top:4px;left:4px;background:rgba(52,152,219,0.85);border:none;border-radius:50%;width:22px;height:22px;color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .gallery-empty{text-align:center;padding:40px 20px;color:var(--text-dim);font-size:13px;}
 
 /* PROFILE */
@@ -293,7 +294,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <input type="file" id="profilePhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleProfilePhoto(event)"/>
   </div>
 
-  <div class="bottom-nav">
+  <div class="bottom-nav" id="bottomNav">
     <div class="nav-item active" id="navToday" onclick="switchView('today')"><div class="ni">🏠</div><span>היום</span></div>
     <div class="nav-item" id="navHistory" onclick="switchView('history')"><div class="ni">📊</div><span>היסטוריה</span></div>
     <div class="nav-item" id="navGallery" onclick="switchView('gallery')"><div class="ni">🖼️</div><span>ספרייה</span></div>
@@ -412,6 +413,13 @@ document.addEventListener('DOMContentLoaded',()=>{
 function initApp(){
   updateDate(); renderAll(); updateProgress();
   registerSW(); checkNotify(); scheduleAll();
+  updateNav();
+}
+function updateNav(){
+  const admin = isAdmin();
+  document.getElementById('navHistory').style.display = admin ? 'flex' : 'none';
+  document.getElementById('navGallery').style.display = 'flex'; // both see gallery
+  document.getElementById('navProfile').style.display = admin ? 'flex' : 'none';
 }
 function updateDate(){
   const days=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
@@ -469,7 +477,18 @@ function renderAll(){
   if(!isAdmin()){
     // LAVI VIEW
     document.getElementById('progressWrap').style.display='none';
-    c.innerHTML=`<div class="section-label">🍽️ ארוחות היום</div>`;
+    // Water display for Lavi (read only)
+    const laviWater = state[todayKey].water || 0;
+    const laviPct = Math.min((laviWater/WATER_GOAL)*100,100);
+    c.innerHTML=`<div class="section-label">💧 מים</div>
+    <div class="water-card">
+      <div class="water-top">
+        <div class="water-title">💧 צריכת מים יומית</div>
+        <div class="water-count">${laviWater}/${WATER_GOAL} כוסות (${laviWater*180}ml / 3000ml)</div>
+      </div>
+      <div class="water-track"><div class="water-fill" style="width:${laviPct}%"></div></div>
+    </div>
+    <div class="section-label">🍽️ ארוחות היום</div>`;
     MENU.filter(m=>m.isLohamim).forEach(meal=>{
       const done=!!state[todayKey].items[meal.id];
       const div=document.createElement('div');
@@ -687,6 +706,7 @@ function renderGallery(){
       <div class="gallery-item">
         <img src="${item.photo}" onclick="openPhoto('${dk}',${ii})"/>
         <div class="gallery-item-label">${item.label}</div>
+        <button class="gallery-item-dl" onclick="downloadPhoto(event,'${item.photo}','${item.label}')">⬇️</button>
         ${del?`<button class="gallery-item-del" onclick="deletePhoto(event,'${dk}','${item.mealId||''}','${item.type}','${item.slot||''}')">✕</button>`:''}
       </div>`).join('');
     return`<div class="gallery-folder">
@@ -806,6 +826,18 @@ function drawWeightChart(history){
   pts.forEach((p,i)=>{const x=tx(i),y=ty(p.w),cur=p.date===todayKey;ctx.beginPath();ctx.arc(x,y,cur?7:4,0,Math.PI*2);ctx.fillStyle=cur?'#e74c3c':'#c9a84c';ctx.fill();if(cur){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();}ctx.fillStyle='rgba(240,234,214,0.45)';ctx.font='9px Heebo';ctx.textAlign='center';const d=new Date(p.date);ctx.fillText(`${d.getDate()}/${d.getMonth()+1}`,x,H-8);});
   // target dot
   if(tarW){const x=pad.left+cW,y=ty(tarW);ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fillStyle='#2ecc71';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();}
+}
+
+// ===== DOWNLOAD =====
+function downloadPhoto(e, src, label){
+  e.stopPropagation();
+  const a = document.createElement('a');
+  a.href = src;
+  a.download = (label||'תמונה').replace(/\s+/g,'-') + '.jpg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast('מוריד תמונה... ⬇️','blue');
 }
 
 // ===== HISTORY =====
